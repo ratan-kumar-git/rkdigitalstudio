@@ -1,16 +1,18 @@
+import YouTubeEmbed from "./YouTubeEmbed";
+
 export default function RecentShoots() {
   const shoots = [
     {
       title: "Beautiful Wedding Shoot – Jaipur Palace",
-      videoUrl: "https://www.youtube.com/embed/tHckmMuhVAs?si=geiizYhqwD4XKpaS",
+      videoUrl: "tHckmMuhVAs",
     },
     {
       title: "Romantic Pre-Wedding – Goa Beach",
-      videoUrl: "https://www.youtube.com/embed/tHckmMuhVAs?si=geiizYhqwD4XKpaS",
+      videoUrl: "tHckmMuhVAs",
     },
     {
       title: "Outdoor Portfolio Shoot – Studio RK",
-      videoUrl: "https://www.youtube.com/embed/tHckmMuhVAs?si=geiizYhqwD4XKpaS",
+      videoUrl: "tHckmMuhVAs",
     },
   ];
 
@@ -30,18 +32,13 @@ export default function RecentShoots() {
           {shoots.map((shoot, index) => (
             <div
               key={index}
-              className="bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition overflow-hidden hover:scale-105"
+              className="bg-gray-50 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition overflow-hidden hover:scale-105"
             >
-              <div className="aspect-video">
-                <iframe
-                  className="w-full h-full"
-                  src={shoot.videoUrl}
-                  title={shoot.title}
-                  allowFullScreen
-                ></iframe>
+              <div className="aspect-video p-4">
+                <YouTubeEmbed videoId={shoot.videoUrl} />
               </div>
-              <div className="p-4 text-left">
-                <h3 className="text-lg font-semibold text-gray-800">
+              <div className="p-4 pt-0 text-left">
+                <h3 className=" text-gray-800">
                   {shoot.title}
                 </h3>
               </div>

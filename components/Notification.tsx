@@ -2,7 +2,7 @@
 export default function Example() {
   return (
     <div className="relative isolate flex items-center justify-center gap-x-6 overflow-hidden bg-gray-800/60 px-6 py-2.5 sm:px-3.5">
-      {/* <div
+      <div
         aria-hidden="true"
         className="absolute top-1/2 left-[max(-7rem,calc(50%-52rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl"
       >
@@ -25,8 +25,8 @@ export default function Example() {
           }}
           className="aspect-577/310 w-144.25 bg-linear-to-r from-[#ff80b5] to-[#9089fc] opacity-40"
         />
-      </div> */}
-      <p className="text-sm/6 text-gray-100 text-center">
+      </div>
+      <p className="text-sm/6 text-gray-50 text-center">
         Our website is currently under development — exciting updates are coming soon!
       </p>
     </div>

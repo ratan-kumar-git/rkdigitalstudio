@@ -30,7 +30,7 @@ export default function ServicesSection() {
     },
     {
       title: "Post-Wedding",
-      img: "/wedding.jpg",
+      img: "/wedding1.jpg",
       desc: "Beautifully captured post-wedding sessions that celebrate your journey together after the grand ceremony.",
     },
     {
@@ -62,7 +62,7 @@ export default function ServicesSection() {
         </p>
 
         {/* Service Cards */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 sm:grid-cols-2 gap-8">
           {services.map((service, index) => (
             <div
               key={index}
@@ -73,7 +73,9 @@ export default function ServicesSection() {
                   src={service.img}
                   alt={service.title}
                   fill
-                  className="object-cover"
+                  className="object-cover object-center"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  quality={50}
                 />
               </div>
               <div className="p-6  text-justify">

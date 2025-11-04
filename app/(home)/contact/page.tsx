@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, MapPin } from "lucide-react";
+import Image from "next/image";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -50,11 +51,15 @@ export default function ContactPage() {
           </ul>
 
           <div className="mt-10">
-            <iframe
-              className="w-full h-64 rounded-xl shadow-md"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d209518.36686770341!2d83.70188419453123!3d24.9462612!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398da8acffbace49%3A0xbc0644001dbc90e7!2sR.K.%20DIGITAL%20STUDIO!5e1!3m2!1sen!2sin!4v1761906509692!5m2!1sen!2sin"
-              loading="lazy"
-            ></iframe>
+            <div className="relative w-full h-64 rounded-xl shadow-md">
+              <Image
+              alt="contact-img"
+              src="/contact.jpg"
+              fill
+              className="rounded-xl shadow-md"
+              quality={50}
+            />
+            </div>
           </div>
         </div>
 

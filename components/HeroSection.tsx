@@ -12,6 +12,7 @@ export default function HeroSection() {
         fill
         className="object-cover object-center opacity-60"
         priority
+        quality={50}
       />
 
       {/* Dark Overlay */}

@@ -7,21 +7,18 @@ export default function Testimonials() {
       feedback:
         "Absolutely loved our wedding photos! Every shot was so natural and emotional — the team truly made our day unforgettable.",
       location: "Jaipur, Rajasthan",
-      img: "/weed1.jpg",
     },
     {
       name: "Neha & Arjun Mehta",
       feedback:
         "From pre-wedding to the big day, they captured every precious moment beautifully. The cinematic video left us speechless!",
       location: "Delhi, India",
-      img: "/weed2.jpg",
     },
     {
       name: "Sneha Patel",
       feedback:
         "Their professionalism and creativity are unmatched. They made my sister’s engagement shoot look like a movie!",
       location: "Ahmedabad, Gujarat",
-      img: "/weed3.jpg",
     },
   ];
 
@@ -47,7 +44,7 @@ export default function Testimonials() {
               <div className="flex items-center justify-center gap-3">
                 <UserCircle2Icon className="w-10 h-10 text-gray-400" />
                 <div className="text-start">
-                  <h4 className="font-semibold text-gray-900">{t.name}</h4>
+                  <h1 className="font-semibold text-gray-900">{t.name}</h1>
                   <p className="text-sm text-gray-500">{t.location}</p>
                 </div>
               </div>

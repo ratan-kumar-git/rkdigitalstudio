@@ -26,12 +26,12 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image 
-            src="/rksLogo.avif"
-            alt="Logo"
-            width={140}
-            height={100}
-            style={{ width: "150px", height: "50px" }}
-          />
+              src="/rksLogo.avif"
+              alt="Logo"
+              width={140}
+              height={100}
+              style={{ width: "156px", height: "48px" }}
+            />
           </Link>
 
           {/* Desktop Menu */}
@@ -56,7 +56,8 @@ export default function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden text-gray-700 hover:text-blue-500"
+            className="md:hidden text-gray-700 hover:text-blue-500" 
+            aria-label={isOpen ? "Close menu" : "Open menu"}
             onClick={toggleMenu}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
