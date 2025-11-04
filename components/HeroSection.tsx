@@ -20,11 +20,10 @@ export default function HeroSection() {
       {/* Content */}
       <div className="relative z-10 px-6 max-w-2xl">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">
-          Capturing Emotions Through the Lens
+          Capturing Life&apos;s Beautiful Moments
         </h1>
         <p className="text-lg md:text-xl text-gray-200 mb-8">
-          From weddings to portraits — every picture tells your story. Let’s
-          make it unforgettable.
+          Professional photography that tells your unique story with artistic vision and technical excellence
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
