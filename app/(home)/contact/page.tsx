@@ -1,10 +1,13 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, MessageSquareTextIcon } from "lucide-react";
 import Image from "next/image";
+import toast from "react-hot-toast";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ContactPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -15,11 +18,33 @@ export default function ContactPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
-    alert("Your message has been sent successfully!");
-    setFormData({ name: "", email: "", message: "" });
+    setIsLoading(true)
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        toast.error("Error in to send message")
+      }
+
+      const data = await res.json();
+      if (data.success){
+        toast.success("Message sent")
+        setFormData({email: "", message: "", name: ""})
+      }
+    } catch (error) {
+      console.error("❌ Error submitting form:", error);
+      toast.error("Something went wrong. Please try again later.")
+    } finally {
+      setIsLoading(false)
+    }
   };
 
   return (
@@ -65,8 +90,8 @@ export default function ContactPage() {
 
         {/* Right Section - Contact Form */}
         <div className="bg-white p-8 rounded-2xl shadow-md">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-6">
-            Send a Message
+          <h3 className="text-2xl font-semibold text-gray-900 mb-6 inline-flex items-center gap-2">
+            <MessageSquareTextIcon /> Send a Message
           </h3>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -105,11 +130,15 @@ export default function ContactPage() {
                 placeholder="Type your message..."
               ></textarea>
             </div>
+            
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-2"
+              variant="default"
+              className="w-full"
             >
-              Send Message
+              <div className="flex items-center justify-center gap-2">
+                {isLoading && <Spinner />} Send Message
+              </div>
             </Button>
           </form>
         </div>
