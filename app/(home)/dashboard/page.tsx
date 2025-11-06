@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import YouTubeEmbed from "@/components/YouTubeEmbed";
+import YouTubeEmbed from "@/components/unused/YouTubeEmbed";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
