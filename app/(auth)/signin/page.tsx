@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
@@ -55,12 +56,12 @@ const Login: React.FC = () => {
       });
 
       if (data?.token) {
-        toast.success("Signup successful!");
+        toast.success("Login successful!");
         router.push("/dashboard");
       }
 
       if (error) {
-        toast.error(error?.message || "Something went wrong on signup");
+        toast.error(error?.message || "Invalid credentials");
         return;
       }
     } catch (err) {
@@ -72,48 +73,50 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
-      {/* Background Elements */}
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+    <div className="relative min-h-screen bg-linear-to-br from-[#fff7ed] via-[#fffaf4] to-[#fef3c7] flex items-center justify-center p-4">
+      {/* Amber Glow Effects */}
+      <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-[#fcd34d]/40 rounded-full blur-[100px] opacity-60 animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-[#d97706]/30 rounded-full blur-[100px] opacity-60 animate-pulse"></div>
 
       <div className="relative w-full max-w-md">
-        {/* Login Card */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20">
-          {/* Header */}
+        {/* Card */}
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-[#fcd34d]/30 p-8">
+          {/* Logo + Header */}
           <div className="text-center mb-8">
             <Link
               href="/"
-              className="flex items-center justify-center space-x-2 mb-4 hover:opacity-90"
+              className="flex items-center justify-center mb-4 hover:opacity-90"
             >
               <Image
                 src="/rksLogo.avif"
                 alt="Logo"
-                width={140}
-                height={100}
-                loading="eager"
-                style={{ width: "150px", height: "50px" }}
+                width={150}
+                height={50}
+                className="object-contain"
               />
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome back
+            <h1 className="text-2xl font-serif font-bold text-[#1e293b] mb-1">
+              Welcome Back
             </h1>
-            <p className="text-gray-600">Sign in to your account to continue</p>
+            <p className="text-[#64748b]">
+              Sign in to continue with{" "}
+              <span className="text-[#d97706] font-medium">RK Digital Studio</span>
+            </p>
           </div>
 
           {/* Login Form */}
           <form onSubmit={handleFormSubmit} className="space-y-6">
-            {/* Email Field */}
+            {/* Email */}
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-[#1e293b] mb-2"
               >
                 Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-[#d97706]/70" />
                 </div>
                 <input
                   id="email"
@@ -122,23 +125,23 @@ const Login: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#d97706] focus:border-transparent transition-all duration-200 bg-white/70 placeholder-gray-400"
                   placeholder="Enter your email"
                 />
               </div>
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-[#1e293b] mb-2"
               >
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-[#d97706]/70" />
                 </div>
                 <input
                   id="password"
@@ -147,7 +150,7 @@ const Login: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
+                  className="block w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#d97706] focus:border-transparent transition-all duration-200 bg-white/70 placeholder-gray-400"
                   placeholder="Enter your password"
                 />
                 <button
@@ -156,18 +159,19 @@ const Login: React.FC = () => {
                   onClick={() => setIsShowPassword((prev) => !prev)}
                 >
                   {isShowPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-[#d97706]" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-[#d97706]" />
                   )}
                 </button>
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-linear-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+              disabled={isLoading}
+              className="w-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white py-3 px-4 rounded-lg font-semibold shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b] transform hover:scale-[1.02] transition-all duration-200"
             >
               <div className="flex items-center justify-center gap-2">
                 {isLoading && <Spinner />} Sign In
@@ -176,24 +180,22 @@ const Login: React.FC = () => {
           </form>
 
           {/* Divider */}
-          <div className="mt-8 mb-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Don&apos;t have an account?
-                </span>
-              </div>
+          <div className="mt-10 mb-6 relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">
+                Don’t have an account?
+              </span>
             </div>
           </div>
 
-          {/* Sign Up Link */}
+          {/* Sign Up */}
           <div className="text-center">
             <Link
               href="/signup"
-              className="text-blue-600 hover:text-blue-500 font-medium transition-colors duration-200"
+              className="text-[#d97706] font-semibold hover:underline transition"
             >
               Create your account
             </Link>

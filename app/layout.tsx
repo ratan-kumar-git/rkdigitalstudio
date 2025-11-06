@@ -17,7 +17,29 @@ export default function RootLayout({
       <body
         className="antialiased"
       >
-        <Toaster />
+        <Toaster
+          toastOptions={{
+            style: {
+              background: "#ffffff",
+              color: "#1e293b",
+              border: "1px solid #fcd34d",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+              borderRadius: "10px",
+            },
+            success: {
+              iconTheme: {
+                primary: "#d97706",
+                secondary: "#fff",
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: "#dc2626",
+                secondary: "#fff",
+              },
+            },
+          }}
+        />
         {children}
       </body>
     </html>

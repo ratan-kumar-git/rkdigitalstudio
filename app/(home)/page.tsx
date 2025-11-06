@@ -1,16 +1,18 @@
-import HeroSection from "@/components/HeroSection";
-import Notification from "@/components/Notification";
-import RecentShoots from "@/components/RecentShoots";
-import ServicesSection from "@/components/ServicesSection";
-import Testimonials from "@/components/Testimonials";
+import HeroSection from "@/components/Home/HeroSection";
+import Packages from "@/components/Home/Packages";
+import Portfolio from "@/components/Home/Portfolio";
+import ServicesSection from "@/components/Home/ServicesSection";
+import Testimonials from "@/components/Home/Testimonials";
+import VideoSamples from "@/components/Home/VideoSamples";
 
 export default function HomePage() {
   return (
     <>
-      <Notification />
       <HeroSection />
       <ServicesSection />
-      <RecentShoots />
+      <Portfolio />
+      <Packages />
+      <VideoSamples />
       <Testimonials />
     </>
   );
