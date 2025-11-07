@@ -30,6 +30,7 @@ export default function Navbar() {
     : [
         { href: "/", label: "Home" },
         { href: "/admin/dashboard", label: "Dashboard" },
+        { href: "/services", label: "Services" },
         { href: "/admin/add-service", label: "Add Services" },
       ];
 

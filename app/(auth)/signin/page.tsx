@@ -55,9 +55,16 @@ const Login: React.FC = () => {
         password: formData.password,
       });
 
-      if (data?.token) {
+      if (data?.user?.email === "admin@gmail.com") {
+        toast.success("Admin login successful!");
+        setFormData({ email: "", password: "" });
+        return router.push("/admin/dashboard");
+      } else if (data?.user) {
         toast.success("Login successful!");
-        router.push("/dashboard");
+        setFormData({ email: "", password: "" });
+        return router.push("/dashboard");
+      } else {
+        toast.error("You are not authorized to access the dashboard");
       }
 
       if (error) {
@@ -94,7 +101,9 @@ const Login: React.FC = () => {
             </h1>
             <p className="text-[#64748b]">
               Sign in to continue with{" "}
-              <span className="text-[#d97706] font-medium">RK Digital Studio</span>
+              <span className="text-[#d97706] font-medium">
+                RK Digital Studio
+              </span>
             </p>
           </div>
 

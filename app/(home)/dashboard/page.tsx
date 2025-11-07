@@ -14,7 +14,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isPending && !data?.user) {
       toast.error("You must be logged in to access the dashboard");
-      router.replace("/signin");
+      return router.replace("/signin");
     }
   }, [data, isPending, router]);
 

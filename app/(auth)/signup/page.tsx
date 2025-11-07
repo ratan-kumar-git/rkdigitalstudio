@@ -48,10 +48,14 @@ const Signup: React.FC = () => {
         password: formData.password,
       });
 
-      if (data?.token) {
+      if (data?.user?.email === "admin@gmail.com") {
         toast.success("Account created successfully!");
         setFormData({ name: "", email: "", password: "" });
-        router.push("/dashboard");
+        return router.push("/admin/dashboard");
+      } else if (data?.user) {
+        toast.success("Account created successfully!");
+        setFormData({ name: "", email: "", password: "" });
+        return router.push("/dashboard");
       } else {
         toast.error(error?.message || "Signup failed. Please try again.");
       }
@@ -84,7 +88,11 @@ const Signup: React.FC = () => {
               Create Your Account
             </h1>
             <p className="text-[#64748b]">
-              Join <span className="text-[#d97706] font-medium">RK Digital Studio</span> and start your journey
+              Join{" "}
+              <span className="text-[#d97706] font-medium">
+                RK Digital Studio
+              </span>{" "}
+              and start your journey
             </p>
           </div>
 
