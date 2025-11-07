@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
+import Logo from "@/components/layout/Logo";
 
 interface FormData {
   name: string;
@@ -64,7 +64,7 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-[#fff7ed] via-[#fffaf4] to-[#fef3c7] flex items-center justify-center p-4 overflow-hidden">
+    <div className="relative min-h-screen bg-linear-to-br from-[#fff7ed] via-[#fffaf4] to-[#fef3c7] flex items-center justify-center p-4 overflow-hidden">
       {/* Ambient Glow */}
       <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-[#fcd34d]/40 rounded-full blur-[120px] opacity-50 animate-pulse"></div>
       <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-[#d97706]/30 rounded-full blur-[120px] opacity-50 animate-pulse"></div>
@@ -78,13 +78,7 @@ const Signup: React.FC = () => {
               href="/"
               className="flex items-center justify-center mb-4 hover:opacity-90"
             >
-              <Image
-                src="/rksLogo.avif"
-                alt="Logo"
-                width={150}
-                height={50}
-                className="object-contain"
-              />
+              <Logo />
             </Link>
             <h1 className="text-2xl font-serif font-bold text-[#1e293b] mb-1">
               Create Your Account
@@ -174,7 +168,7 @@ const Signup: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white py-3 px-4 rounded-lg font-semibold shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b] transform hover:scale-[1.02] transition-all duration-200"
+              className="w-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white py-3 px-4 rounded-lg font-semibold shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b] transform hover:scale-[1.02] transition-all duration-200"
             >
               <div className="flex items-center justify-center gap-2">
                 {isLoading && <Spinner />} Create Account

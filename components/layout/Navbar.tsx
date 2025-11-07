@@ -7,18 +7,31 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 import Logo from "./Logo";
-
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
+import { authClient } from "@/lib/auth-client";
+import UserMenu from "./UserMenu";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { data } = authClient.useSession();
+  const user = data?.user;
+
+  const isAdmin = user?.email === "admin@gmail.com"
+
+  const navLinks = !isAdmin
+    ? [
+        { href: "/", label: "Home" },
+        { href: "/dashboard", label: "Dashboard" },
+        { href: "/services", label: "Services" },
+        { href: "/booking", label: "Booking" },
+        { href: "/about", label: "About" },
+        { href: "/contact", label: "Contact" },
+      ]
+    : [
+        { href: "/", label: "Home" },
+        { href: "/admin/dashboard", label: "Dashboard" },
+        { href: "/admin/add-service", label: "Add Services" },
+      ];
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
@@ -48,9 +61,13 @@ export default function Navbar() {
               ></span>
             </Link>
           ))}
-          <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold px-5 py-2 shadow-md transition-transform hover:scale-[1.05]">
-            <Link href="/signin">Sign in</Link>
-          </Button>
+          {user ? (
+            <UserMenu />
+          ) : (
+            <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold px-5 py-2 shadow-md transition-transform hover:scale-[1.05]">
+              <Link href="/signin">Sign in</Link>
+            </Button>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -82,9 +99,13 @@ export default function Navbar() {
               </Link>
             ))}
 
-            <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white font-semibold mt-3 shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b]">
-              <Link href="/signin">Signin</Link>
-            </Button>
+            {user ? (
+              <UserMenu />
+            ) : (
+              <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white font-semibold mt-3 shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b]">
+                <Link href="/signin">Signin</Link>
+              </Button>
+            )}
           </div>
         </div>
       )}

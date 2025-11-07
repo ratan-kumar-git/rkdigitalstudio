@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
+import Logo from "@/components/layout/Logo";
 
 interface LoginFormData {
   email: string;
@@ -87,13 +87,7 @@ const Login: React.FC = () => {
               href="/"
               className="flex items-center justify-center mb-4 hover:opacity-90"
             >
-              <Image
-                src="/rksLogo.avif"
-                alt="Logo"
-                width={150}
-                height={50}
-                className="object-contain"
-              />
+              <Logo />
             </Link>
             <h1 className="text-2xl font-serif font-bold text-[#1e293b] mb-1">
               Welcome Back
