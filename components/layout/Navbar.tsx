@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -6,11 +6,12 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
+import Logo from "./Logo";
+
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
-  { href: "/portfolio", label: "Portfolio" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -21,16 +22,9 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-2">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="text-[#d97706] text-2xl font-bold font-serif tracking-tight">
-            RK
-          </div>
-          <span className="text-[#1e293b] font-serif text-lg font-semibold group-hover:text-[#d97706] transition-colors">
-            Digital Studio
-          </span>
-        </Link>
+        <Logo />
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
@@ -54,9 +48,7 @@ export default function Navbar() {
               ></span>
             </Link>
           ))}
-          <Button
-            className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold px-5 py-2 shadow-md transition-transform hover:scale-[1.05]"
-          >
+          <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold px-5 py-2 shadow-md transition-transform hover:scale-[1.05]">
             <Link href="/signin">Sign in</Link>
           </Button>
         </div>
@@ -90,9 +82,7 @@ export default function Navbar() {
               </Link>
             ))}
 
-            <Button
-              className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white font-semibold mt-3 shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b]"
-            >
+            <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white font-semibold mt-3 shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b]">
               <Link href="/signin">Signin</Link>
             </Button>
           </div>

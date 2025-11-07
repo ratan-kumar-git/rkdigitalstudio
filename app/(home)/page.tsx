@@ -1,5 +1,4 @@
 import HeroSection from "@/components/Home/HeroSection";
-import Packages from "@/components/Home/Packages";
 import Portfolio from "@/components/Home/Portfolio";
 import ServicesSection from "@/components/Home/ServicesSection";
 import Testimonials from "@/components/Home/Testimonials";
@@ -11,7 +10,6 @@ export default function HomePage() {
       <HeroSection />
       <ServicesSection />
       <Portfolio />
-      <Packages />
       <VideoSamples />
       <Testimonials />
     </>

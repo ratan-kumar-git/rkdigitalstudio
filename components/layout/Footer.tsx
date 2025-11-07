@@ -1,40 +1,52 @@
-'use client';
+"use client";
 
 import Link from "next/link";
-import { Instagram, Youtube, Phone, Mail, MapPin, MessageCircle } from "lucide-react";
+import {
+  Instagram,
+  Youtube,
+  Phone,
+  Mail,
+  MapPin,
+  MessageCircle,
+} from "lucide-react";
+import Logo from "./Logo";
 
 export default function Footer() {
   return (
     <footer className="bg-[#fff7ed] border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:space-y-0 sm:gap-10">
         {/* 1️⃣ Brand */}
-        <div>
-          <h3 className="text-2xl font-serif font-bold text-[#1e293b] mb-3">
-            <span className="text-[#d97706]">RK</span> Digital Studio
-          </h3>
+        <div className="space-y-4">
+          <Logo />
           <p className="text-[#64748b] text-sm leading-relaxed max-w-xs">
-            Capturing life’s most beautiful moments through creative photography & cinematic storytelling.
+            Capturing life’s most beautiful moments through creative photography
+            & cinematic storytelling.
           </p>
         </div>
 
-        {/* 2️⃣ Quick Links */}
         <div>
           <h4 className="text-[#1e293b] font-semibold mb-4">Quick Links</h4>
           <ul className="space-y-2 text-sm text-[#64748b]">
             <li>
-              <Link href="/" className="hover:text-[#d97706] transition-colors">Home</Link>
+              <Link href="/" className="hover:text-[#d97706] transition-colors">
+                Home
+              </Link>
             </li>
             <li>
-              <Link href="#services" className="hover:text-[#d97706] transition-colors">Services</Link>
+              <Link
+                href="#services"
+                className="hover:text-[#d97706] transition-colors"
+              >
+                Services
+              </Link>
             </li>
             <li>
-              <Link href="#portfolio" className="hover:text-[#d97706] transition-colors">Portfolio</Link>
-            </li>
-            <li>
-              <Link href="#packages" className="hover:text-[#d97706] transition-colors">Packages</Link>
-            </li>
-            <li>
-              <Link href="#booking" className="hover:text-[#d97706] transition-colors">Book Now</Link>
+              <Link
+                href="/booking"
+                className="hover:text-[#d97706] transition-colors"
+              >
+                Book Now
+              </Link>
             </li>
           </ul>
         </div>
