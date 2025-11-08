@@ -10,8 +10,8 @@ export default function Logo() {
       <Image
         src="https://ik.imagekit.io/ratanofficial/rkdigitalstudio/newLogoRk.png?updatedAt=1762518047314"
         alt="RK Digital Studio Logo"
-        width={192}
-        height={53}
+        width={172}
+        height={45}
         priority
       />
     </Link>

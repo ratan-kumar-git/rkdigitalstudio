@@ -78,12 +78,11 @@ const Signup: React.FC = () => {
         <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-[#fcd34d]/30 p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <Link
-              href="/"
+            <div
               className="flex items-center justify-center mb-4 hover:opacity-90"
             >
               <Logo />
-            </Link>
+            </div>
             <h1 className="text-2xl font-serif font-bold text-[#1e293b] mb-1">
               Create Your Account
             </h1>

@@ -37,6 +37,14 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-2">
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={() => setOpen(!open)}
+          className="md:hidden text-[#1e293b] focus:outline-none"
+        >
+          {open ? <X size={26} /> : <Menu size={26} />}
+        </button>
+        
         {/* Logo */}
         <Logo />
 
@@ -71,13 +79,15 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden text-[#1e293b] focus:outline-none"
-        >
-          {open ? <X size={26} /> : <Menu size={26} />}
-        </button>
+        {user ? (<div className="md:hidden">
+          <UserMenu />
+        </div>) : (
+          <div className="md:hidden">
+            <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold px-4 py-2 shadow-md transition-transform hover:scale-[1.05]">
+              <Link href="/signin">Sign in</Link>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Mobile Dropdown */}
@@ -93,20 +103,12 @@ export default function Navbar() {
                   "text-base font-medium px-3 py-2 rounded-md transition-all duration-200",
                   pathname === link.href
                     ? "text-[#d97706] bg-[#fef3c7]"
-                    : "text-[#334155] hover:bg-[#f8fafc] hover:text-[#1e293b]"
+                    : "text-[#334155] hover:bg-[#fef3c7] hover:text-[#1e293b]"
                 )}
               >
                 {link.label}
               </Link>
             ))}
-
-            {user ? (
-              <UserMenu />
-            ) : (
-              <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white font-semibold mt-3 shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b]">
-                <Link href="/signin">Signin</Link>
-              </Button>
-            )}
           </div>
         </div>
       )}
