@@ -51,11 +51,11 @@ const Signup: React.FC = () => {
       if (data?.user?.email === "admin@gmail.com") {
         toast.success("Account created successfully!");
         setFormData({ name: "", email: "", password: "" });
-        return router.push("/admin/dashboard");
+        return router.replace("/admin/dashboard");
       } else if (data?.user) {
         toast.success("Account created successfully!");
         setFormData({ name: "", email: "", password: "" });
-        return router.push("/dashboard");
+        return router.replace("/dashboard");
       } else {
         toast.error(error?.message || "Signup failed. Please try again.");
       }

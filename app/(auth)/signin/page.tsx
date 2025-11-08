@@ -58,11 +58,11 @@ const Login: React.FC = () => {
       if (data?.user?.email === "admin@gmail.com") {
         toast.success("Admin login successful!");
         setFormData({ email: "", password: "" });
-        return router.push("/admin/dashboard");
+        return router.replace("/admin/dashboard");
       } else if (data?.user) {
         toast.success("Login successful!");
         setFormData({ email: "", password: "" });
-        return router.push("/dashboard");
+        return router.replace("/dashboard");
       } else {
         toast.error("You are not authorized to access the dashboard");
       }

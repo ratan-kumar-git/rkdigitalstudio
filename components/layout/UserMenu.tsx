@@ -38,7 +38,7 @@ export default function UserMenu() {
       fetchOptions: {
         onSuccess: () => {
           toast.success("Logout successful!");
-          return router.push("/signin");
+          return router.replace("/signin");
         },
       },
     });
