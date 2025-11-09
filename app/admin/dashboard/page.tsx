@@ -2,10 +2,21 @@
 import { Spinner } from "@/components/ui/spinner";
 import YouTubeEmbed from "@/components/unused/YouTubeEmbed";
 import { authClient } from "@/lib/auth-client";
-
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
   const { data, isPending } = authClient.useSession();
+
+  useEffect(() => {
+    if (!isPending && !data?.user) {
+      toast.error("You must be logged in to access the dashboard");
+      return router.replace("/signin");
+    }
+  }, [data, isPending, router]);
+
 
   if (isPending || !data?.user) {
     return (

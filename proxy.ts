@@ -5,38 +5,35 @@ import { auth } from "@/lib/auth";
 export default async function middleware(req: NextRequest) {
   const session = await auth.api.getSession({ headers: req.headers });
   const user = session?.user;
-  
-  const { pathname } = req.nextUrl;
+  const pathname = req.nextUrl.pathname.replace(/\/$/, ""); // normalize
 
-  const publicRoutes = [ "/signin", "/signup"];
+  const publicRoutes = ["/signin", "/signup"];
   const privateRoutes = ["/dashboard", "/admin/dashboard", "/admin/add-service"];
 
-  // 🔓 If not logged in, block access to private routes
+  const isAdmin = user?.email === "admin@gmail.com";
+  const isPrivateRoute = privateRoutes.some(route => pathname.startsWith(route));
 
-  if (!user && privateRoutes.includes(pathname)) {
+  // 🔒 Block unauthenticated access to private routes
+  if (!user && isPrivateRoute) {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
 
-  // 🚫 If logged in, block access to signin/signup
+  // 🚫 Prevent logged-in users from visiting signin/signup
   if (user && publicRoutes.includes(pathname)) {
-    // Admin → send to admin dashboard
-    if (user.email === "admin@gmail.com") {
-      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
-    } else {
-    // Normal user → send to user dashboard
-    return NextResponse.redirect(new URL("/dashboard", req.url)); 
-    }
+    return NextResponse.redirect(
+      new URL(isAdmin ? "/admin/dashboard" : "/dashboard", req.url)
+    );
   }
 
-  // 🔒 Protect all /admin routes — only admin allowed
-  if (pathname.startsWith("/admin") && user?.email !== "admin@gmail.com") {
+  // 🔐 Restrict /admin routes to admin only
+  if (pathname.startsWith("/admin") && !isAdmin) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
   return NextResponse.next();
 }
 
-// Routes Proxy should not run on
+// Middleware should not run on these
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
 };
