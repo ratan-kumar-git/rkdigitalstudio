@@ -11,12 +11,15 @@ export default function DashboardPage() {
   const { data, isPending } = authClient.useSession();
 
   useEffect(() => {
-    if (!isPending && !data?.user) {
-      toast.error("You must be logged in to access the dashboard");
-      router.replace("/signin");
-      return;
+    if (isPending) return;
+
+    if (!data?.user) {
+      toast.error("Your session has expired. Please sign in again.");
+      window.location.href = "/signin";
+    } else if (data.user.email === "admin@gmail.com") {
+      window.location.href = "/admin/dashboard";
     }
-  }, [data, isPending, router]);
+  }, [data?.user, isPending, router]);
 
   if (isPending || !data?.user) {
     return (

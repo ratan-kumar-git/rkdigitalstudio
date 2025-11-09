@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import Logo from "@/components/layout/Logo";
 
@@ -15,7 +14,6 @@ interface LoginFormData {
 }
 
 const Login: React.FC = () => {
-  const router = useRouter();
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<LoginFormData>({
@@ -56,26 +54,29 @@ const Login: React.FC = () => {
       });
 
       if (error) {
-        toast.error(error?.message || "Invalid credentials");
+        toast.error(error.message || "Invalid email or password.");
         return;
       }
 
-      if (data?.user?.email === "admin@gmail.com") {
+      if (!data?.user) {
+        toast.error("Login attempt failed. Please try again.");
+        return;
+      }
+
+      setFormData({ email: "", password: "" }); 
+
+      // Replace with checkIsAdmin(data.user)
+      if (data.user.email === "admin@gmail.com") {
         toast.success("Admin login successful!");
-        setFormData({ email: "", password: "" });
-        return router.replace("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
+        return;
       }
 
-      if (data?.user) {
-        toast.success("Login successful!");
-        setFormData({ email: "", password: "" });
-        return router.replace("/dashboard");
-      }
-
-      toast.error("You are not authorized to access the dashboard");
+      toast.success("Login successful!");
+      window.location.href = "/dashboard";
     } catch (err) {
-      console.log("Error in Signin", err);
-      toast.error("Something went wrong during login");
+      console.error("Error in Signin:", err);
+      toast.error("An unexpected error occurred during login.");
     } finally {
       setIsLoading(false);
     }

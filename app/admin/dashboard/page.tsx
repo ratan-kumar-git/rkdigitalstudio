@@ -4,19 +4,20 @@ import YouTubeEmbed from "@/components/unused/YouTubeEmbed";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { data, isPending } = authClient.useSession();
 
   useEffect(() => {
-    if (!isPending && !data?.user) {
-      toast.error("You must be logged in to access the dashboard");
-      return router.replace("/signin");
+    if (isPending) return;
+
+    if (!data?.user) {
+      window.location.href = "/signin";
+    } else if (data.user.email !== "admin@gmail.com") {
+      window.location.href = "/unauthorized";
     }
   }, [data, isPending, router]);
-
 
   if (isPending || !data?.user) {
     return (

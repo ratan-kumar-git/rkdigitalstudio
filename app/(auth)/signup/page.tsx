@@ -5,7 +5,6 @@ import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import Logo from "@/components/layout/Logo";
 
@@ -16,7 +15,6 @@ interface FormData {
 }
 
 const Signup: React.FC = () => {
-  const router = useRouter();
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -49,26 +47,28 @@ const Signup: React.FC = () => {
       });
 
       if (error) {
-        toast.error(error?.message || "Signup failed. Please try again.");
+        toast.error(error.message || "Signup failed. Please check the information provided.");
         return;
       }
 
-      if (data?.user?.email !== "admin@gmail.com") {
-        toast.success("Account created successfully!");
-        setFormData({ name: "", email: "", password: "" });
-        return router.replace("/dashboard");
+      if (!data?.user) {
+        toast.error("Registration failed. No user profile was created.");
+        return;
       }
 
-      if (data?.user.email === "admin@gmail.com") {
+      setFormData({ name: "", email: "", password: "" });
+
+      if (data.user.email === "admin@gmail.com") {
         toast.success("Admin account created successfully!");
-        setFormData({ name: "", email: "", password: "" });
-        return router.replace("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
+        return;
       }
 
-      toast.error("Signup failed. Please try again.");
+      toast.success("Account created successfully! Welcome.");
+      window.location.href = "/dashboard";
     } catch (err) {
-      console.log("Error in Signup", err);
-      toast.error("Something went wrong during signup");
+      console.error("Error in Signup:", err);
+      toast.error("An unexpected network error occurred during signup.");
     } finally {
       setIsLoading(false);
     }

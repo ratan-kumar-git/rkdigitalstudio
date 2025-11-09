@@ -16,35 +16,43 @@ export default function Navbar() {
   const { data } = authClient.useSession();
   const user = data?.user;
 
-  const isAdmin = user?.email === "admin@gmail.com"
+  const isAdmin = user?.email === "admin@gmail.com";
+  const isAuthenticated = !!user;
 
-  const navLinks = !isAdmin
+  const navLinks = !isAuthenticated
     ? [
         { href: "/", label: "Home" },
-        { href: "/dashboard", label: "Dashboard" },
         { href: "/services", label: "Services" },
-        { href: "/booking", label: "Booking" },
         { href: "/about", label: "About" },
         { href: "/contact", label: "Contact" },
       ]
     : [
         { href: "/", label: "Home" },
-        { href: "/admin/dashboard", label: "Dashboard" },
-        { href: "/services", label: "Services" },
-        { href: "/admin/add-service", label: "Add Services" },
+        { href: isAdmin ? "/admin/dashboard" : "/dashboard", label: "Dashboard", },
+        { href: isAdmin ? "/admin/add-service" : "/services", label: "Services", },
+        ...(!isAdmin
+          ? [
+              { href: "/about", label: "About" },
+              { href: "/contact", label: "Contact" },
+            ]
+          : []),
       ];
+
+  // Close menu on route change or link click
+  const handleLinkClick = () => setOpen(false);
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-2">
         {/* Mobile Menu Toggle */}
         <button
+          aria-label="Toggle menu"
           onClick={() => setOpen(!open)}
           className="md:hidden text-[#1e293b] focus:outline-none"
         >
           {open ? <X size={26} /> : <Menu size={26} />}
         </button>
-        
+
         {/* Logo */}
         <Logo />
 
@@ -79,9 +87,11 @@ export default function Navbar() {
           )}
         </div>
 
-        {user ? (<div className="md:hidden">
-          <UserMenu />
-        </div>) : (
+        {user ? (
+          <div className="md:hidden">
+            <UserMenu />
+          </div>
+        ) : (
           <div className="md:hidden">
             <Button className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold px-4 py-2 shadow-md transition-transform hover:scale-[1.05]">
               <Link href="/signin">Sign in</Link>
@@ -98,7 +108,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setOpen(false)}
+                onClick={handleLinkClick}
                 className={clsx(
                   "text-base font-medium px-3 py-2 rounded-md transition-all duration-200",
                   pathname === link.href

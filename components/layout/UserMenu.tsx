@@ -21,7 +21,7 @@ export default function UserMenu() {
   const { data } = authClient.useSession();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  if (!data?.user.email) return null;
+  if (!data?.user) return null;
 
   const user = data.user;
   const isAdmin = user.email === "admin@gmail.com";
@@ -34,12 +34,13 @@ export default function UserMenu() {
         .toUpperCase()
     : "U";
 
-  const handelLogout = async () => {
+  const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
       await authClient.signOut();
       toast.success("Logout successful!");
-      return router.replace("/signin");
+      window.location.href = "/signin";
+      router.refresh();
     } catch (error) {
       toast.error("Error while logging out. Please try again.");
       console.error("Logout error:", error);
@@ -87,11 +88,12 @@ export default function UserMenu() {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onClick={handelLogout}
+          onClick={handleLogout}
           disabled={isLoggingOut}
           className="cursor-pointer flex items-center gap-2 text-red-600 hover:bg-red-50"
         >
-          <LogOut className="w-4 h-4" /> {isLoggingOut ? "Logging out..." : "Logout"}
+          <LogOut className="w-4 h-4" />{" "}
+          {isLoggingOut ? "Logging out..." : "Logout"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
