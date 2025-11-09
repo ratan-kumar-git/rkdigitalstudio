@@ -21,13 +21,13 @@ export default function Hero() {
             <Button
               className="rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold px-6 py-3 shadow-md transition-transform hover:scale-[1.05]"
             >
-              <Link href="/services">Book Now</Link>
+              <Link href="/dashboard">Book Now</Link>
             </Button>
             <Button
               variant="outline"
               className="rounded-full border-[#d97706] text-[#d97706] hover:bg-[#fff7ed] px-6 py-3 font-medium transition-colors"
             >
-              <Link href="/portfolio">View Portfolio</Link>
+              <Link href="/services">View Services</Link>
             </Button>
           </div>
         </div>
