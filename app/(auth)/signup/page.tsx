@@ -48,17 +48,24 @@ const Signup: React.FC = () => {
         password: formData.password,
       });
 
+      if (error) {
+        toast.error(error?.message || "Signup failed. Please try again.");
+        return;
+      }
+
       if (data?.user?.email === "admin@gmail.com") {
-        toast.success("Account created successfully!");
+        toast.success("Admin account created successfully!");
         setFormData({ name: "", email: "", password: "" });
         return router.replace("/admin/dashboard");
-      } else if (data?.user) {
+      }
+
+      if (data?.user) {
         toast.success("Account created successfully!");
         setFormData({ name: "", email: "", password: "" });
         return router.replace("/dashboard");
-      } else {
-        toast.error(error?.message || "Signup failed. Please try again.");
       }
+
+      toast.error("Signup failed. Please try again.");
     } catch (err) {
       console.log("Error in Signup", err);
       toast.error("Something went wrong during signup");
@@ -78,9 +85,7 @@ const Signup: React.FC = () => {
         <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-[#fcd34d]/30 p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div
-              className="flex items-center justify-center mb-4 hover:opacity-90"
-            >
+            <div className="flex items-center justify-center mb-4 hover:opacity-90">
               <Logo />
             </div>
             <h1 className="text-2xl font-serif font-bold text-[#1e293b] mb-1">
@@ -159,6 +164,9 @@ const Signup: React.FC = () => {
                 />
                 <button
                   type="button"
+                  aria-label={
+                    isShowPassword ? "Hide password" : "Show password"
+                  }
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setIsShowPassword(!isShowPassword)}
                 >
@@ -178,7 +186,14 @@ const Signup: React.FC = () => {
               className="w-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white py-3 px-4 rounded-lg font-semibold shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b] transform hover:scale-[1.02] transition-all duration-200"
             >
               <div className="flex items-center justify-center gap-2">
-                {isLoading && <Spinner />} Create Account
+                {isLoading ? (
+                  <>
+                    <Spinner className="w-5 h-5 text-white" />
+                    <span>Creating Account...</span>
+                  </>
+                ) : (
+                  <span>Create Account</span>
+                )}
               </div>
             </button>
           </form>

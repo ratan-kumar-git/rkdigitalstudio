@@ -14,11 +14,12 @@ import { LogOut, User } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-
+import { useState } from "react";
 
 export default function UserMenu() {
-    const router = useRouter();
+  const router = useRouter();
   const { data } = authClient.useSession();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   if (!data?.user.email) return null;
 
@@ -34,14 +35,17 @@ export default function UserMenu() {
     : "U";
 
   const handelLogout = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          toast.success("Logout successful!");
-          return router.replace("/signin");
-        },
-      },
-    });
+    setIsLoggingOut(true);
+    try {
+      await authClient.signOut();
+      toast.success("Logout successful!");
+      return router.replace("/signin");
+    } catch (error) {
+      toast.error("Error while logging out. Please try again.");
+      console.error("Logout error:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -84,9 +88,10 @@ export default function UserMenu() {
 
         <DropdownMenuItem
           onClick={handelLogout}
+          disabled={isLoggingOut}
           className="cursor-pointer flex items-center gap-2 text-red-600 hover:bg-red-50"
         >
-          <LogOut className="w-4 h-4" /> Logout
+          <LogOut className="w-4 h-4" /> {isLoggingOut ? "Logging out..." : "Logout"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

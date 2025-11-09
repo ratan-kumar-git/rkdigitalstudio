@@ -23,7 +23,6 @@ export default function ServicesPage() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const data = await res.json();
-      console.log("Fetched services:", data);
 
       if (Array.isArray(data?.data)) {
         setServices(data.data);

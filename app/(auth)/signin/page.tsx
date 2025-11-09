@@ -55,22 +55,24 @@ const Login: React.FC = () => {
         password: formData.password,
       });
 
-      if (data?.user?.email === "admin@gmail.com") {
-        toast.success("Admin login successful!");
-        setFormData({ email: "", password: "" });
-        return router.replace("/admin/dashboard");
-      } else if (data?.user) {
-        toast.success("Login successful!");
-        setFormData({ email: "", password: "" });
-        return router.replace("/dashboard");
-      } else {
-        toast.error("You are not authorized to access the dashboard");
-      }
-
       if (error) {
         toast.error(error?.message || "Invalid credentials");
         return;
       }
+
+      if (data?.user?.email === "admin@gmail.com") {
+        toast.success("Admin login successful!");
+        setFormData({ email: "", password: "" });
+        return router.replace("/admin/dashboard");
+      }
+
+      if (data?.user) {
+        toast.success("Login successful!");
+        setFormData({ email: "", password: "" });
+        return router.replace("/dashboard");
+      }
+
+      toast.error("You are not authorized to access the dashboard");
     } catch (err) {
       console.log("Error in Signin", err);
       toast.error("Something went wrong during login");
@@ -90,9 +92,7 @@ const Login: React.FC = () => {
         <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-[#fcd34d]/30 p-8">
           {/* Logo + Header */}
           <div className="text-center mb-8">
-            <div
-              className="flex items-center justify-center mb-4 hover:opacity-90"
-            >
+            <div className="flex items-center justify-center mb-4 hover:opacity-90">
               <Logo />
             </div>
             <h1 className="text-2xl font-serif font-bold text-[#1e293b] mb-1">
@@ -157,6 +157,9 @@ const Login: React.FC = () => {
                 />
                 <button
                   type="button"
+                  aria-label={
+                    isShowPassword ? "Hide password" : "Show password"
+                  }
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setIsShowPassword((prev) => !prev)}
                 >
@@ -169,6 +172,15 @@ const Login: React.FC = () => {
               </div>
             </div>
 
+            {/* <div className="text-right mt-2">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-[#d97706] hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div> */}
+
             {/* Submit */}
             <button
               type="submit"
@@ -176,7 +188,14 @@ const Login: React.FC = () => {
               className="w-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white py-3 px-4 rounded-lg font-semibold shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b] transform hover:scale-[1.02] transition-all duration-200"
             >
               <div className="flex items-center justify-center gap-2">
-                {isLoading && <Spinner />} Sign In
+                {isLoading ? (
+                  <>
+                    <Spinner className="w-5 h-5 text-white" />
+                    <span>Signing In...</span>
+                  </>
+                ) : (
+                  <span>Sign In</span>
+                )}
               </div>
             </button>
           </form>
