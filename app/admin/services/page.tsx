@@ -13,6 +13,7 @@ interface IService {
   title: string;
   description: string;
   imageUrl: string;
+  imageFileId: string;
   createdAt: string;
 }
 

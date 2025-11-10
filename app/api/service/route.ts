@@ -8,10 +8,10 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const body = await req.json();
-    const { slug, title, description, imageUrl } = body;
+    const { slug, title, description, imageUrl, imageFileId } = body;
 
     // Validate required fields
-    if (!slug || !title || !description || !imageUrl) {
+    if (!slug || !title || !description || !imageUrl || !imageFileId) {
       return NextResponse.json(
         { success: false, message: "All fields are required" },
         { status: 400 }
@@ -32,6 +32,7 @@ export async function POST(req: Request) {
       title,
       description,
       imageUrl,
+      imageFileId,
     });
 
     return NextResponse.json(

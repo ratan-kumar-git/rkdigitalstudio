@@ -2,6 +2,63 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Service from "@/models/Service";
 
+
+// GET /api/service/:id
+export async function GET(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params;
+    await dbConnect();
+    const service = await Service.findById(id);
+    if (!service) {
+      return NextResponse.json(
+        { success: false, message: "Service not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, service });
+  } catch (error) {
+    console.error("Get service error:", error);
+    return NextResponse.json(
+      { success: false, message: "Error fetching service" },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/service/:id
+export async function PUT(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params;
+    const body = await req.json();
+    await dbConnect(); 
+    const updated = await Service.findByIdAndUpdate(id, body, { new: true });
+    if (!updated) {
+      return NextResponse.json(
+        { success: false, message: "Service not found" },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({
+      success: true,
+      message: "Service updated successfully",
+      data: updated,
+    });
+  } catch (error) {
+    console.error("Update service error:", error);
+    return NextResponse.json(
+      { success: false, message: "Error updating service" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE /api/service/:id
 export async function DELETE(
   req: Request,
@@ -31,3 +88,5 @@ export async function DELETE(
     );
   }
 }
+
+

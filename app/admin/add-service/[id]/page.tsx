@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import {
   upload,
@@ -17,6 +17,7 @@ import {
 import { authenticator } from "@/lib/imageClintAuth";
 
 interface IService {
+  _id?: string;
   slug: string;
   title: string;
   description: string;
@@ -24,8 +25,11 @@ interface IService {
   imageFileId: string;
 }
 
-export default function AddServicePage() {
+export default function EditServicePage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
+
   const [form, setForm] = useState<IService>({
     slug: "",
     title: "",
@@ -33,11 +37,30 @@ export default function AddServicePage() {
     imageUrl: "",
     imageFileId: "",
   });
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFileId, setImageFileId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const res = await fetch(`/api/service/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch service");
+        const data = await res.json();
+        setForm(data.service);
+        setImagePreview(data.service.imageUrl);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load service details");
+      } finally {
+        setFetching(false);
+      }
+    };
+    if (id) fetchService();
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -78,9 +101,9 @@ export default function AddServicePage() {
 
       const imageUrl = res.url ?? "";
       const imageFileId = res.fileId ?? "";
+
       setForm((prev) => ({ ...prev, imageUrl, imageFileId }));
       setImagePreview(imageUrl || null);
-      setImageFileId(imageFileId || null);
       toast.success("Image uploaded successfully!");
     } catch (error) {
       console.error(error);
@@ -96,7 +119,7 @@ export default function AddServicePage() {
   };
 
   const handleRemoveImage = async () => {
-    if (!imageFileId) {
+    if (!form.imageFileId) {
       setImagePreview(null);
       setForm((prev) => ({ ...prev, imageUrl: "", imageFileId: "" }));
       return;
@@ -106,12 +129,11 @@ export default function AddServicePage() {
       const res = await fetch("/api/imagekit/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: imageFileId }),
+        body: JSON.stringify({ fileId: form.imageFileId }),
       });
       if (!res.ok) throw new Error("Failed to delete image");
       setImagePreview(null);
-      setImageFileId(null);
-      setForm((prev) => ({ ...prev, imageUrl: "" }));
+      setForm((prev) => ({ ...prev, imageUrl: "", imageFileId: "" }));
       toast.success("Image removed");
     } catch (err) {
       console.error(err);
@@ -119,66 +141,72 @@ export default function AddServicePage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 🔹 Update existing service
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title) return toast.error("Title field is required!");
     if (!form.description) return toast.error("Description field is required!");
     if (!form.imageUrl) return toast.error("Please upload an image!");
-    if (!form.imageFileId) return toast.error("Image upload incomplete!");
+    if (!id) return toast.error("Invalid service id")
 
     setLoading(true);
     try {
-      const res = await fetch("/api/service", {
-        method: "POST",
+      const res = await fetch(`/api/service/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      toast.success("Service created successfully!");
-      router.push(`/admin/service-details/${data.data._id}`);
+      toast.success("Service updated successfully!");
+      router.push("/admin/services");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to save service");
+      toast.error("Failed to update service");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching)
+    return (
+      <div className="flex items-center justify-center min-h-screen text-gray-600">
+        Loading service details...
+      </div>
+    );
+
   return (
     <div className="min-h-screen bg-[#f9fafb] py-10 flex flex-col">
       <div className="flex-1 p-8">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
-          {/* Form Section */}
+          {/* Left Section: Form */}
           <div className="bg-white border border-amber-100 rounded-xl shadow-sm p-8">
             <h2 className="text-lg font-semibold text-[#1e293b] mb-6">
-              Service Information
+              Edit Service Information
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Title */}
+            <form onSubmit={handleUpdate} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-[#475569] mb-2">
                   Title
                 </label>
                 <Input
                   name="title"
-                  placeholder="Enter service title"
                   value={form.title}
                   onChange={handleChange}
+                  placeholder="Enter service title"
                 />
               </div>
 
-              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-[#475569] mb-2">
                   Description
                 </label>
                 <Textarea
                   name="description"
-                  placeholder="Describe the service"
                   value={form.description}
                   onChange={handleChange}
+                  placeholder="Describe the service"
                   className="min-h-[130px]"
                 />
               </div>
@@ -188,15 +216,15 @@ export default function AddServicePage() {
                 disabled={loading}
                 className="w-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold py-2.5 rounded-lg shadow-md transition-transform hover:scale-[1.02]"
               >
-                {loading ? "Saving..." : "Create Service"}
+                {loading ? "Updating..." : "Update Service"}
               </Button>
             </form>
           </div>
 
-          {/* Image Upload Section */}
+          {/* Right Section: Image Upload */}
           <div className="bg-white border border-amber-100 rounded-xl shadow-sm p-8">
             <h2 className="text-lg font-semibold text-[#1e293b] mb-6">
-              Upload Image
+              Upload / Replace Image
             </h2>
 
             <Input
@@ -204,9 +232,9 @@ export default function AddServicePage() {
               accept="image/*"
               ref={fileInputRef}
               onChange={handleImageUpload}
+              disabled={form.imageFileId ? true : false}
             />
 
-            {/* Progress */}
             {uploadProgress > 0 && (
               <div className="w-full bg-amber-50 rounded-full h-2 mt-3">
                 <div
@@ -216,7 +244,6 @@ export default function AddServicePage() {
               </div>
             )}
 
-            {/* Image Preview */}
             {imagePreview ? (
               <div className="relative mt-6 group">
                 <Image

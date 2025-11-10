@@ -5,6 +5,7 @@ export interface IService extends Document {
   title: string;
   description: string;
   imageUrl: string;
+  imageFileId: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -28,6 +29,10 @@ const ServiceSchema = new Schema<IService>(
       trim: true,
     },
     imageUrl: {
+      type: String,
+      required: true,
+    },
+    imageFileId: {
       type: String,
       required: true,
     },

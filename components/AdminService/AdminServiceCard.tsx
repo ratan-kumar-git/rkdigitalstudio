@@ -22,6 +22,7 @@ interface Service {
   title: string;
   description: string;
   imageUrl: string;
+  imageFileId?: string;
 }
 
 interface Props {
@@ -41,8 +42,20 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
       });
 
       if (!res.ok) throw new Error("Failed to delete service");
-      toast.success("Service deleted successfully!");
 
+      if (service.imageFileId) {
+        const delImage = await fetch("/api/imagekit/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileId: service.imageFileId }),
+        });
+
+        if (!delImage.ok) {
+          console.warn("Failed to delete image from ImageKit");
+        }
+      }
+
+      toast.success("Service deleted successfully!");
       if (onDelete) onDelete(service._id);
     } catch (err) {
       console.error(err);
@@ -95,7 +108,7 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
           </Link>
 
           {/* Edit Card */}
-          <Link href={`/`} className="flex-1">
+          <Link href={`/admin/add-service/${service._id}`} className="flex-1">
             <Button
               variant="outline"
               size="sm"
@@ -106,7 +119,10 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
           </Link>
 
           {/* Add/Edit Details */}
-          <Link href={`/`} className="flex-1">
+          <Link
+            href={`/admin/service-details/${service._id}`}
+            className="flex-1"
+          >
             <Button
               variant="outline"
               size="sm"
