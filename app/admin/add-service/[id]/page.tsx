@@ -141,12 +141,11 @@ export default function EditServicePage() {
     }
   };
 
-  // 🔹 Update existing service
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title) return toast.error("Title field is required!");
-    if (!form.description) return toast.error("Description field is required!");
-    if (!form.imageUrl) return toast.error("Please upload an image!");
+    if (!form.title) return toast.error("Please enter a service title!");
+    if (!form.description) return toast.error("Please enter a service description!");
+    if (!form.imageUrl) return toast.error("Please upload an image before saving!");
     if (!id) return toast.error("Invalid service id")
 
     setLoading(true);
