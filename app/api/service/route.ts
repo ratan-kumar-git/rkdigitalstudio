@@ -7,7 +7,6 @@ import dbConnect from "@/lib/dbConnect";
 export async function POST(req: Request) {
   try {
     await dbConnect();
-
     const body = await req.json();
     const { slug, title, description, imageUrl } = body;
 

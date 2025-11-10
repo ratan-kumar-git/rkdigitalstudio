@@ -19,26 +19,33 @@ export default function Navbar() {
   const isAdmin = user?.email === "admin@gmail.com";
   const isAuthenticated = !!user;
 
-  const navLinks = !isAuthenticated
-    ? [
-        { href: "/", label: "Home" },
-        { href: "/services", label: "Services" },
-        { href: "/about", label: "About" },
-        { href: "/contact", label: "Contact" },
-      ]
-    : [
-        { href: "/", label: "Home" },
-        { href: isAdmin ? "/admin/dashboard" : "/dashboard", label: "Dashboard", },
-        { href: isAdmin ? "/admin/add-service" : "/services", label: "Services", },
-        ...(!isAdmin
-          ? [
-              { href: "/about", label: "About" },
-              { href: "/contact", label: "Contact" },
-            ]
-          : []),
-      ];
+  // ✅ Define navLinks clearly
+  let navLinks: { href: string; label: string }[] = [];
 
-  // Close menu on route change or link click
+  if (!isAuthenticated) {
+    navLinks = [
+      { href: "/", label: "Home" },
+      { href: "/services", label: "Services" },
+      { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact" },
+    ];
+  } else if (isAdmin) {
+    navLinks = [
+      { href: "/admin/dashboard", label: "Dashboard" },
+      { href: "/admin/services", label: "Services" },
+      { href: "/admin/add-service", label: "Add Service" },
+      { href: "/admin/booking", label: "Booking" },
+    ];
+  } else {
+    navLinks = [
+      { href: "/dashboard", label: "Dashboard" },
+      { href: "/services", label: "Services" },
+      { href: "/booking", label: "Booking" },
+      { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact" },
+    ];
+  }
+
   const handleLinkClick = () => setOpen(false);
 
   return (
@@ -87,6 +94,7 @@ export default function Navbar() {
           )}
         </div>
 
+        {/* Mobile User Menu / Signin */}
         {user ? (
           <div className="md:hidden">
             <UserMenu />
