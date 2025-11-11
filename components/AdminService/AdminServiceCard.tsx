@@ -3,7 +3,15 @@
 import { Image } from "@imagekit/next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Edit, Eye, FileText, Trash2 } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  FileText,
+  Trash2,
+  ImageIcon,
+  Video,
+  IndianRupee,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import {
@@ -50,13 +58,11 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
           body: JSON.stringify({ fileId: service.imageFileId }),
         });
 
-        if (!delImage.ok) {
-          console.warn("Failed to delete image from ImageKit");
-        }
+        if (!delImage.ok) console.warn("Failed to delete image from ImageKit");
       }
 
       toast.success("Service deleted successfully!");
-      if (onDelete) onDelete(service._id);
+      onDelete?.(service._id);
     } catch (err) {
       console.error(err);
       toast.error("Error deleting service");
@@ -77,10 +83,8 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
           urlEndpoint="https://ik.imagekit.io/ratanofficial"
           src={service.imageUrl}
           alt={service.title}
-          loading="eager"
           width={400}
           height={300}
-          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
@@ -95,13 +99,13 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
         </p>
 
         {/* ─── Action Buttons ───────────────────── */}
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {/* View */}
           <Link href={`/services/${service.slug}`} className="flex-1">
             <Button
               variant="outline"
               size="sm"
-              className="w-full flex items-center justify-center gap-2 text-[#d97706] border-[#d97706]/50 hover:bg-[#fef3c7]"
+              className="w-full gap-2 text-amber-700 border-amber-300 hover:bg-amber-50"
             >
               <Eye className="w-4 h-4" /> View
             </Button>
@@ -112,33 +116,75 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
             <Button
               variant="outline"
               size="sm"
-              className="w-full flex items-center justify-center gap-2 text-blue-600 border-blue-300 hover:bg-blue-50"
+              className="w-full gap-2 text-blue-700 border-blue-300 hover:bg-blue-50"
             >
               <Edit className="w-4 h-4" /> Edit Card
             </Button>
           </Link>
 
-          {/* Add/Edit Details */}
+          {/* Edit Details */}
           <Link
-            href={`/admin/service-details/${service._id}`}
+            href={`/admin/service-details/${service._id}/description`}
             className="flex-1"
           >
             <Button
               variant="outline"
               size="sm"
-              className="w-full flex items-center justify-center gap-2 text-green-600 border-green-300 hover:bg-green-50"
+              className="w-full gap-2 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
             >
-              <FileText className="w-4 h-4" /> Edit Details
+              <FileText className="w-4 h-4" /> Details
             </Button>
           </Link>
 
-          {/* Delete - uses modal */}
+          {/* Edit Packages */}
+          <Link
+            href={`/admin/service-details/${service._id}/packages`}
+            className="flex-1"
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-cyan-600 border-cyan-300 hover:bg-cyan-50"
+            >
+              <IndianRupee className="w-4 h-4" /> Packages
+            </Button>
+          </Link>
+
+          {/* Manage Images */}
+          <Link
+            href={`/admin/service-details/${service._id}/images`}
+            className="flex-1"
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-violet-700 border-violet-300 hover:bg-violet-50"
+            >
+              <ImageIcon className="w-4 h-4" /> Images
+            </Button>
+          </Link>
+
+          {/* Manage Videos */}
+          <Link
+            href={`/admin/service-details/${service._id}/videos`}
+            className="flex-1"
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-fuchsia-700 border-fuchsia-300 hover:bg-fuchsia-50"
+            >
+              <Video className="w-4 h-4" /> Videos
+            </Button>
+          </Link>
+
+          {/* Delete (Dialog) */}
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full flex items-center justify-center gap-2 text-red-600 border-red-300 hover:bg-red-50"
+                className="col-span-2 w-full gap-2 text-red-700 border-red-300 hover:bg-red-50"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete

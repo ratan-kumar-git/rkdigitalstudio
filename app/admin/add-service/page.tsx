@@ -26,6 +26,8 @@ interface IService {
 
 export default function AddServicePage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [form, setForm] = useState<IService>({
     slug: "",
     title: "",
@@ -33,17 +35,19 @@ export default function AddServicePage() {
     imageUrl: "",
     imageFileId: "",
   });
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFileId, setImageFileId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Handle form changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
+
     if (name === "title") {
       const newSlug = value
         .toLowerCase()
@@ -54,16 +58,28 @@ export default function AddServicePage() {
     }
   };
 
+  // Image upload
   const handleImageUpload = async () => {
     const fileInput = fileInputRef.current;
     if (!fileInput?.files?.length)
       return toast.error("Please select an image");
+
     const file = fileInput.files[0];
+
+    // Basic validations
+    if (!file.type.startsWith("image/")) {
+      return toast.error("Only image files are allowed!");
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return toast.error("Image must be smaller than 5 MB!");
+    }
+
     const abortController = new AbortController();
 
     try {
       const auth = await authenticator();
       const { signature, expire, token, publicKey } = auth;
+
       const res = await upload({
         expire,
         token,
@@ -77,10 +93,11 @@ export default function AddServicePage() {
       });
 
       const imageUrl = res.url ?? "";
-      const imageFileId = res.fileId ?? "";
-      setForm((prev) => ({ ...prev, imageUrl, imageFileId }));
+      const fileId = res.fileId ?? "";
+
+      setForm((prev) => ({ ...prev, imageUrl, imageFileId: fileId }));
       setImagePreview(imageUrl || null);
-      setImageFileId(imageFileId || null);
+      setImageFileId(fileId || null);
       toast.success("Image uploaded successfully!");
     } catch (error) {
       console.error(error);
@@ -95,6 +112,7 @@ export default function AddServicePage() {
     }
   };
 
+  // Remove image from ImageKit
   const handleRemoveImage = async () => {
     if (!imageFileId) {
       setImagePreview(null);
@@ -108,38 +126,58 @@ export default function AddServicePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileId: imageFileId }),
       });
+
       if (!res.ok) throw new Error("Failed to delete image");
+
       setImagePreview(null);
       setImageFileId(null);
-      setForm((prev) => ({ ...prev, imageUrl: "" }));
-      toast.success("Image removed");
+      setForm((prev) => ({ ...prev, imageUrl: "", imageFileId: "" }));
+      toast.success("Image removed successfully!");
     } catch (err) {
       console.error(err);
       toast.error("Error deleting image");
     }
   };
 
+  // Submit form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title) return toast.error("Please enter a service title!");
-    if (!form.description) return toast.error("Please enter a service description!");
-    if (!form.imageUrl) return toast.error("Please upload an image before saving!");
-    if (!form.imageFileId) return toast.error("Image upload incomplete!");
+
+    if (!form.title || !form.description)
+      return toast.error("Please fill all required fields!");
+    if (!form.imageUrl || !form.imageFileId)
+      return toast.error("Please upload an image first!");
 
     setLoading(true);
     try {
+      // Create Service
       const res = await fetch("/api/service", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      toast.success("Service created successfully!");
-      router.push(`/admin/service-details/${data.data._id}`);
+      if (!res.ok) throw new Error(data.message || "Failed to save service");
+
+      // Create default ServiceDetail
+      const res2 = await fetch("/api/service-details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ serviceId: data.data._id }),
+      });
+
+      const detailData = await res2.json();
+      if (!res2.ok)
+        toast.error(
+          detailData.message || "Service created, but details not initialized"
+        );
+      else toast.success("Service and details created successfully!");
+
+      router.push("/admin/services");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to save service");
+      toast.error("Failed to create service");
     } finally {
       setLoading(false);
     }
@@ -149,7 +187,7 @@ export default function AddServicePage() {
     <div className="min-h-screen bg-[#f9fafb] py-10 flex flex-col">
       <div className="flex-1 p-8">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
-          {/* Form Section */}
+          {/* Left Section - Form */}
           <div className="bg-white border border-amber-100 rounded-xl shadow-sm p-8">
             <h2 className="text-lg font-semibold text-[#1e293b] mb-6">
               Service Information
@@ -166,6 +204,7 @@ export default function AddServicePage() {
                   placeholder="Enter service title"
                   value={form.title}
                   onChange={handleChange}
+                  disabled={loading}
                 />
               </div>
 
@@ -179,6 +218,7 @@ export default function AddServicePage() {
                   placeholder="Describe the service"
                   value={form.description}
                   onChange={handleChange}
+                  disabled={loading}
                   className="min-h-[130px]"
                 />
               </div>
@@ -186,33 +226,40 @@ export default function AddServicePage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold py-2.5 rounded-lg shadow-md transition-transform hover:scale-[1.02]"
+                className="w-full bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-semibold py-2.5 rounded-lg shadow-md transition-transform hover:scale-[1.02]"
               >
                 {loading ? "Saving..." : "Create Service"}
               </Button>
             </form>
           </div>
 
-          {/* Image Upload Section */}
+          {/* Right Section - Image Upload */}
           <div className="bg-white border border-amber-100 rounded-xl shadow-sm p-8">
             <h2 className="text-lg font-semibold text-[#1e293b] mb-6">
               Upload Image
             </h2>
 
-            <Input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleImageUpload}
-            />
+            <Input type="file" accept="image/*" ref={fileInputRef} />
+            <Button
+              type="button"
+              onClick={handleImageUpload}
+              disabled={loading}
+              className="mt-3 w-full bg-linear-to-r from-amber-500 to-amber-600 text-white"
+            >
+              Upload Image
+            </Button>
 
-            {/* Progress */}
-            {uploadProgress > 0 && (
-              <div className="w-full bg-amber-50 rounded-full h-2 mt-3">
-                <div
-                  className="bg-linear-to-r from-[#f59e0b] to-[#d97706] h-2 rounded-full transition-all"
-                  style={{ width: `${uploadProgress}%` }}
-                ></div>
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="mt-3">
+                <div className="w-full bg-amber-50 rounded-full h-2">
+                  <div
+                    className="bg-linear-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-amber-600 mt-2 text-center">
+                  Uploading... {uploadProgress.toFixed(0)}%
+                </p>
               </div>
             )}
 
@@ -229,6 +276,7 @@ export default function AddServicePage() {
                 <button
                   type="button"
                   onClick={handleRemoveImage}
+                  disabled={loading}
                   className="absolute top-3 right-3 bg-white/80 text-[#1e293b] hover:bg-red-500 hover:text-white rounded-full px-2 py-1 shadow-sm transition-all"
                 >
                   ✕

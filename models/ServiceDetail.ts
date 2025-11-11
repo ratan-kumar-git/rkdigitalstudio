@@ -1,5 +1,17 @@
 import { Schema, model, models, Document, Types } from "mongoose";
 
+export interface IGalleryItem {
+  imageUrl: string;
+  imageFileId: string;
+  thumbnailUrl?: string;
+}
+
+export interface ICoverImage {
+  imageUrl: string;
+  imageFileId: string;
+  thumbnailUrl?: string;
+}
+
 export interface IPackage {
   name: string;
   price: string;
@@ -8,12 +20,12 @@ export interface IPackage {
 }
 
 export interface IServiceDetail extends Document {
-  service: Types.ObjectId;
+  serviceId: Types.ObjectId;
   title: string;
   description: string;
-  coverImage?: string;
+  coverImage?: ICoverImage | null;
   packages: IPackage[];
-  gallery: string[];
+  gallery: IGalleryItem[];
   videoSamples?: string[];
   createdAt?: Date;
   updatedAt?: Date;
@@ -21,32 +33,52 @@ export interface IServiceDetail extends Document {
 
 const PackageSchema = new Schema<IPackage>(
   {
-    name: { type: String, required: true },
-    price: { type: String, required: true },
+    name: { type: String, required: true, trim: true },
+    price: { type: String, required: true, trim: true },
     features: { type: [String], required: true },
     highlight: { type: Boolean, default: false },
   },
   { _id: false }
 );
 
+const GalleryItemSchema = new Schema<IGalleryItem>(
+  {
+    imageUrl: { type: String, required: true, trim: true },
+    imageFileId: { type: String, required: true, trim: true },
+    thumbnailUrl: { type: String, default: "", trim: true },
+  },
+  { _id: false }
+);
+
+const CoverImageSchema = new Schema<ICoverImage>(
+  {
+    imageUrl: { type: String, required: true, trim: true },
+    imageFileId: { type: String, required: true, trim: true },
+    thumbnailUrl: { type: String, default: "", trim: true },
+  },
+  { _id: false }
+);
+
 const ServiceDetailSchema = new Schema<IServiceDetail>(
   {
-    service: {
+    serviceId: {
       type: Schema.Types.ObjectId,
       ref: "Service",
       required: true,
+      index: true,
     },
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
-    coverImage: { type: String, default: "" },
+    coverImage: { type: CoverImageSchema, default: null },
     packages: { type: [PackageSchema], default: [] },
-    gallery: { type: [String], default: [] },
+    gallery: { type: [GalleryItemSchema], default: [] },
     videoSamples: { type: [String], default: [] },
   },
   { timestamps: true }
 );
 
 const ServiceDetail =
-  models.ServiceDetail || model<IServiceDetail>("ServiceDetail", ServiceDetailSchema);
+  models.ServiceDetail ||
+  model<IServiceDetail>("ServiceDetail", ServiceDetailSchema);
 
 export default ServiceDetail;
