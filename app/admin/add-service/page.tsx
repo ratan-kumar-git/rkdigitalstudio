@@ -15,6 +15,7 @@ import {
   ImageKitServerError,
 } from "@imagekit/next";
 import { authenticator } from "@/lib/imageClintAuth";
+import { Trash2 } from "lucide-react";
 
 interface IService {
   slug: string;
@@ -277,9 +278,9 @@ export default function AddServicePage() {
                   type="button"
                   onClick={handleRemoveImage}
                   disabled={loading}
-                  className="absolute top-3 right-3 bg-white/80 text-[#1e293b] hover:bg-red-500 hover:text-white rounded-full px-2 py-1 shadow-sm transition-all"
+                  className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full px-2 py-2"
                 >
-                  ✕
+                  <Trash2 className="size-5" />
                 </button>
               </div>
             ) : (
