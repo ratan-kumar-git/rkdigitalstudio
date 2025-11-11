@@ -15,6 +15,7 @@ import {
   ImageKitServerError,
 } from "@imagekit/next";
 import { authenticator } from "@/lib/imageClintAuth";
+import { Trash2 } from "lucide-react";
 
 interface IService {
   _id?: string;
@@ -44,6 +45,9 @@ export default function EditServicePage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
+  /* -------------------------------------------------------------------------- */
+  /* 🟢 FETCH SERVICE DATA                                                      */
+  /* -------------------------------------------------------------------------- */
   useEffect(() => {
     const fetchService = async () => {
       try {
@@ -62,31 +66,51 @@ export default function EditServicePage() {
     if (id) fetchService();
   }, [id]);
 
+  /* -------------------------------------------------------------------------- */
+  /* ✏️ HANDLE FORM INPUTS                                                     */
+  /* -------------------------------------------------------------------------- */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-    if (name === "title") {
-      const newSlug = value
-        .toLowerCase()
-        .trim()
-        .replace(/ /g, "-")
-        .replace(/[^\w-]+/g, "");
-      setForm((prev) => ({ ...prev, slug: newSlug }));
-    }
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "title"
+        ? {
+            slug: value
+              .toLowerCase()
+              .trim()
+              .replace(/ /g, "-")
+              .replace(/[^\w-]+/g, ""),
+          }
+        : {}),
+    }));
   };
 
+  /* -------------------------------------------------------------------------- */
+  /* 🟡 HANDLE IMAGE UPLOAD (ImageKit + DB)                                    */
+  /* -------------------------------------------------------------------------- */
   const handleImageUpload = async () => {
     const fileInput = fileInputRef.current;
     if (!fileInput?.files?.length)
       return toast.error("Please select an image");
+
     const file = fileInput.files[0];
+    if (!file.type.startsWith("image/"))
+      return toast.error("Only image files are allowed!");
+    if (file.size > 5 * 1024 * 1024)
+      return toast.error("Image must be smaller than 5 MB!");
+
+    setLoading(true);
     const abortController = new AbortController();
 
     try {
+      // 1️⃣ Authenticate ImageKit
       const auth = await authenticator();
       const { signature, expire, token, publicKey } = auth;
+
+      // 2️⃣ Upload to ImageKit
       const res = await upload({
         expire,
         token,
@@ -94,7 +118,7 @@ export default function EditServicePage() {
         publicKey,
         file,
         fileName: file.name,
-        folder: "rkdigitalstudio",
+        folder: "rkdigitalstudio/services",
         onProgress: (e) => setUploadProgress((e.loaded / e.total) * 100),
         abortSignal: abortController.signal,
       });
@@ -102,9 +126,24 @@ export default function EditServicePage() {
       const imageUrl = res.url ?? "";
       const imageFileId = res.fileId ?? "";
 
+      // 3️⃣ Save to MongoDB immediately
+      const dbRes = await fetch(`/api/service/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          imageUrl,
+          imageFileId,
+        }),
+      });
+
+      const dbData = await dbRes.json();
+      if (!dbRes.ok) throw new Error(dbData.message);
+
+      // 4️⃣ Update UI state
       setForm((prev) => ({ ...prev, imageUrl, imageFileId }));
-      setImagePreview(imageUrl || null);
-      toast.success("Image uploaded successfully!");
+      setImagePreview(imageUrl);
+      toast.success("Image uploaded and saved successfully!");
     } catch (error) {
       console.error(error);
       if (error instanceof ImageKitAbortError) toast.error("Upload aborted");
@@ -115,36 +154,60 @@ export default function EditServicePage() {
       else if (error instanceof ImageKitServerError)
         toast.error("Server error during upload");
       else toast.error("Unknown upload error");
+    } finally {
+      setLoading(false);
+      setUploadProgress(0);
     }
   };
 
+  /* -------------------------------------------------------------------------- */
+  /* 🔴 HANDLE IMAGE DELETE (DB + ImageKit)                                    */
+  /* -------------------------------------------------------------------------- */
   const handleRemoveImage = async () => {
-    if (!form.imageFileId) {
-      setImagePreview(null);
-      setForm((prev) => ({ ...prev, imageUrl: "", imageFileId: "" }));
-      return;
-    }
+    if (!form.imageFileId) return;
 
+    setLoading(true);
     try {
-      const res = await fetch("/api/imagekit/delete", {
+      // 1️⃣ Remove from MongoDB first
+      const res = await fetch(`/api/service/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          imageUrl: "",
+          imageFileId: "",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      // 2️⃣ Delete from ImageKit
+      const res2 = await fetch("/api/imagekit/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileId: form.imageFileId }),
       });
-      if (!res.ok) throw new Error("Failed to delete image");
+      if (!res2.ok) throw new Error("Failed to delete from ImageKit");
+
+      // 3️⃣ Update UI
       setImagePreview(null);
       setForm((prev) => ({ ...prev, imageUrl: "", imageFileId: "" }));
-      toast.success("Image removed");
+      toast.success("Image deleted successfully!");
     } catch (err) {
       console.error(err);
       toast.error("Error deleting image");
+    } finally {
+      setLoading(false);
     }
   };
 
+  /* -------------------------------------------------------------------------- */
+  /* 💾 UPDATE SERVICE DETAILS (TEXT FIELDS)                                   */
+  /* -------------------------------------------------------------------------- */
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title) return toast.error("Please enter a service title!");
-    if (!form.description) return toast.error("Please enter a service description!");
+    if (!form.title) return toast.error("Please enter a title!");
+    if (!form.description) return toast.error("Please enter a description!");
     if (!form.imageUrl) return toast.error("Please upload an image before saving!");
     if (!id) return toast.error("Invalid service id")
 
@@ -157,6 +220,7 @@ export default function EditServicePage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
+
       toast.success("Service updated successfully!");
       router.push("/admin/services");
     } catch (error) {
@@ -174,6 +238,9 @@ export default function EditServicePage() {
       </div>
     );
 
+  /* -------------------------------------------------------------------------- */
+  /* 🖼️ UI                                                                     */
+  /* -------------------------------------------------------------------------- */
   return (
     <div className="min-h-screen bg-[#f9fafb] py-10 flex flex-col">
       <div className="flex-1 p-8">
@@ -213,7 +280,7 @@ export default function EditServicePage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-linear-to-r from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#f59e0b] text-white font-semibold py-2.5 rounded-lg shadow-md transition-transform hover:scale-[1.02]"
+                className="w-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white font-semibold py-2.5 rounded-lg shadow-md transition-transform hover:scale-[1.02]"
               >
                 {loading ? "Updating..." : "Update Service"}
               </Button>
@@ -231,7 +298,6 @@ export default function EditServicePage() {
               accept="image/*"
               ref={fileInputRef}
               onChange={handleImageUpload}
-              disabled={form.imageFileId ? true : false}
             />
 
             {uploadProgress > 0 && (
@@ -255,9 +321,10 @@ export default function EditServicePage() {
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute top-3 right-3 bg-white/80 text-[#1e293b] hover:bg-red-500 hover:text-white rounded-full px-2 py-1 shadow-sm transition-all"
+                  disabled={loading}
+                  className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full p-2"
                 >
-                  ✕
+                  <Trash2 className="size-5" />
                 </button>
               </div>
             ) : (

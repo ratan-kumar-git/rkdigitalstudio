@@ -1,5 +1,6 @@
 // import Image from "next/image";
 import { Image } from "@imagekit/next";
+import NextImage from "next/image";
 import Link from "next/link";
 
 interface Service {
@@ -17,16 +18,26 @@ const ServiceCard = (service: Service) => {
       className="group bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
     >
       <div className="relative w-full h-48">
-        <Image
-          urlEndpoint="https://ik.imagekit.io/ratanofficial"
-          src={service.imageUrl}
-          alt={service.title}
-          loading="eager"
-          width={400}
-          height={300}
-          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {service.imageUrl ? (
+          <Image
+            urlEndpoint="https://ik.imagekit.io/ratanofficial"
+            src={service.imageUrl}
+            alt={service.title}
+            loading="eager"
+            width={400}
+            height={300}
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <NextImage
+            src="/coming-soon.jpg"
+            alt={service.title}
+            width={400}
+            height={300}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
       </div>
 
       {/* Content */}

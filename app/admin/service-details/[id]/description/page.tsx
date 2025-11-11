@@ -15,6 +15,7 @@ import {
   ImageKitServerError,
 } from "@imagekit/next";
 import { authenticator } from "@/lib/imageClintAuth";
+import { Trash2 } from "lucide-react";
 
 interface CoverImage {
   imageUrl: string;
@@ -43,14 +44,15 @@ export default function EditServiceDescription() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Fetch existing service detail
+  /* -------------------------------------------------------------------------- */
+  /* 🟢 FETCH SERVICE DETAIL DATA                                               */
+  /* -------------------------------------------------------------------------- */
   useEffect(() => {
     if (!id) return;
     const fetchData = async () => {
       try {
         const res = await fetch(`/api/service-details/${id}`);
         const data = await res.json();
-
         if (!res.ok) throw new Error(data.message || "Failed to load data");
 
         setForm({
@@ -70,7 +72,9 @@ export default function EditServiceDescription() {
     fetchData();
   }, [id]);
 
-  // Handle text input changes
+  /* -------------------------------------------------------------------------- */
+  /* ✏️ HANDLE TEXT INPUT                                                      */
+  /* -------------------------------------------------------------------------- */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -78,12 +82,15 @@ export default function EditServiceDescription() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle image upload to ImageKit
+  /* -------------------------------------------------------------------------- */
+  /* 🟡 UPLOAD COVER IMAGE (ImageKit + DB SAVE)                                */
+  /* -------------------------------------------------------------------------- */
   const handleImageUpload = async () => {
     const fileInput = fileInputRef.current;
-    if (!fileInput?.files?.length) return toast.error("Please select an image");
-    const file = fileInput.files[0];
+    if (!fileInput?.files?.length)
+      return toast.error("Please select an image");
 
+    const file = fileInput.files[0];
     if (!file.type.startsWith("image/"))
       return toast.error("Only image files are allowed!");
     if (file.size > 5 * 1024 * 1024)
@@ -93,9 +100,11 @@ export default function EditServiceDescription() {
     setUploading(true);
 
     try {
+      // 1️⃣ Authenticate ImageKit
       const auth = await authenticator();
       const { signature, expire, token, publicKey } = auth;
 
+      // 2️⃣ Upload to ImageKit
       const res = await upload({
         expire,
         token,
@@ -103,21 +112,35 @@ export default function EditServiceDescription() {
         publicKey,
         file,
         fileName: file.name,
-        folder: "rkdigitalstudio",
+        folder: "rkdigitalstudio/service-covers",
         onProgress: (e) => setUploadProgress((e.loaded / e.total) * 100),
         abortSignal: abortController.signal,
       });
 
+      const imageUrl = res.url ?? "";
+      const imageFileId = res.fileId ?? "";
+      const thumbnailUrl = res.thumbnailUrl ?? "";
+
+      // 3️⃣ Save to MongoDB immediately
+      const dbRes = await fetch(`/api/service-details/${id}/description`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          coverImage: { imageUrl, imageFileId, thumbnailUrl },
+        }),
+      });
+
+      const dbData = await dbRes.json();
+      if (!dbRes.ok) throw new Error(dbData.message);
+
+      // 4️⃣ Update UI
       setForm((prev) => ({
         ...prev,
-        coverImage: {
-          imageUrl: res.url ?? "",
-          imageFileId: res.fileId ?? "",
-          thumbnailUrl: res.thumbnailUrl ?? "",
-        },
+        coverImage: { imageUrl, imageFileId, thumbnailUrl },
       }));
 
-      toast.success("Image uploaded successfully!");
+      toast.success("Image uploaded and saved successfully!");
     } catch (error) {
       console.error(error);
       if (error instanceof ImageKitAbortError) toast.error("Upload aborted");
@@ -134,37 +157,54 @@ export default function EditServiceDescription() {
     }
   };
 
-  // Handle image removal
+  /* -------------------------------------------------------------------------- */
+  /* 🔴 DELETE COVER IMAGE (DB + ImageKit)                                     */
+  /* -------------------------------------------------------------------------- */
   const handleRemoveImage = async () => {
-    const fileId = form.coverImage.imageFileId;
-    if (!fileId) {
-      setForm((prev) => ({
-        ...prev,
-        coverImage: { imageUrl: "", imageFileId: "", thumbnailUrl: "" },
-      }));
-      return;
-    }
+    const { imageFileId } = form.coverImage;
+    if (!imageFileId) return;
 
+    setLoading(true);
     try {
+      // 1️⃣ Clear image from MongoDB first
+      const dbRes = await fetch(`/api/service-details/${id}/description`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          coverImage: { imageUrl: "", imageFileId: "", thumbnailUrl: "" },
+        }),
+      });
+
+      const dbData = await dbRes.json();
+      if (!dbRes.ok) throw new Error(dbData.message);
+
+      // 2️⃣ Delete from ImageKit
       const res = await fetch("/api/imagekit/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId }),
+        body: JSON.stringify({ fileId: imageFileId }),
       });
-      if (!res.ok) throw new Error("Failed to delete image");
+      if (!res.ok) throw new Error("Failed to delete image from ImageKit");
 
+      // 3️⃣ Update UI
       setForm((prev) => ({
         ...prev,
         coverImage: { imageUrl: "", imageFileId: "", thumbnailUrl: "" },
       }));
-      toast.success("Image removed successfully!");
+
+      toast.success("Image deleted successfully!");
     } catch (error) {
       console.error(error);
       toast.error("Error deleting image");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle form submission
+  /* -------------------------------------------------------------------------- */
+  /* 💾 UPDATE TITLE + DESCRIPTION ONLY                                        */
+  /* -------------------------------------------------------------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -192,7 +232,9 @@ export default function EditServiceDescription() {
     }
   };
 
-  // UI
+  /* -------------------------------------------------------------------------- */
+  /* 🖼️ UI                                                                     */
+  /* -------------------------------------------------------------------------- */
   return (
     <div className="min-h-screen bg-[#f9fafb] py-10 flex flex-col">
       <div className="max-w-5xl mx-auto bg-white border border-amber-100 rounded-xl shadow-sm p-8">
@@ -237,7 +279,12 @@ export default function EditServiceDescription() {
             </label>
 
             <div className="space-y-3">
-              <Input type="file" accept="image/*" ref={fileInputRef} disabled={form.coverImage.imageUrl ? true : false} />
+              <Input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                disabled={uploading || !!form.coverImage.imageUrl}
+              />
               <Button
                 type="button"
                 onClick={handleImageUpload}
@@ -248,6 +295,15 @@ export default function EditServiceDescription() {
                   ? `Uploading... ${uploadProgress.toFixed(0)}%`
                   : "Upload Image"}
               </Button>
+
+              {uploadProgress > 0 && (
+                <div className="w-full bg-amber-50 rounded-full h-2">
+                  <div
+                    className="bg-linear-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              )}
 
               {form.coverImage.imageUrl ? (
                 <div className="relative mt-4 group">
@@ -262,9 +318,9 @@ export default function EditServiceDescription() {
                     type="button"
                     onClick={handleRemoveImage}
                     disabled={loading}
-                    className="absolute top-3 right-3 bg-white/80 text-[#1e293b] hover:bg-red-500 hover:text-white rounded-full px-2 py-1 shadow-sm transition-all"
+                    className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full px-2 py-2"
                   >
-                    ✕
+                    <Trash2 className="size-5" />
                   </button>
                 </div>
               ) : (

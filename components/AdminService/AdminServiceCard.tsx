@@ -1,6 +1,7 @@
 "use client";
 
 import { Image } from "@imagekit/next";
+import NextImage from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,14 +80,24 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
     >
       {/* ─── Image ─────────────────────────────── */}
       <div className="relative w-full h-48">
-        <Image
-          urlEndpoint="https://ik.imagekit.io/ratanofficial"
-          src={service.imageUrl}
-          alt={service.title}
-          width={400}
-          height={300}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {service.imageUrl ? (
+          <Image
+            urlEndpoint="https://ik.imagekit.io/ratanofficial"
+            src={service.imageUrl}
+            alt={service.title}
+            width={400}
+            height={300}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <NextImage
+            src="/coming-soon.jpg"
+            alt={service.title}
+            width={400}
+            height={300}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
       </div>
 
       {/* ─── Content ────────────────────────────── */}
