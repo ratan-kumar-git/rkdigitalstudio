@@ -121,7 +121,7 @@ export default function ServiceVideoManager() {
         <div className="flex gap-4 mb-6">
           <Input
             type="url"
-            placeholder="Enter video URL (YouTube, Vimeo, etc.)"
+            placeholder="Enter YouTube videoId only!"
             value={newVideoUrl}
             onChange={(e) => setNewVideoUrl(e.target.value)}
           />
@@ -138,19 +138,26 @@ export default function ServiceVideoManager() {
         {videos.length === 0 ? (
           <p className="text-center text-[#94a3b8]">No videos added yet</p>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((videoUrl, idx) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {videos.map((videoId, idx) => (
               <div
                 key={idx}
                 className="border border-amber-100 rounded-lg overflow-hidden shadow-sm relative group"
               >
-                <iframe
-                  src={videoUrl.replace("watch?v=", "embed/")}
-                  className="w-full h-48"
-                  allowFullScreen
-                ></iframe>
+                {/* YouTube Embed */}
+                <div className="aspect-w-16 aspect-h-9">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${videoId}`}
+                    title={`YouTube Video ${idx + 1}`}
+                    className="w-auto h-48"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+
+                {/* Delete Button */}
                 <button
-                  onClick={() => handleConfirmDelete(videoUrl)}
+                  onClick={() => handleConfirmDelete(videoId)}
                   disabled={loading}
                   className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all"
                 >
