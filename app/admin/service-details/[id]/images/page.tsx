@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, Upload, ImageIcon } from "lucide-react";
 
 interface IGalleryItem {
   imageUrl: string;
@@ -48,7 +48,7 @@ export default function ServiceGalleryManager() {
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
 
   /* -------------------------------------------------------------------------- */
-  /* 🟢 FETCH SERVICE DETAIL DATA                                               */
+  /* 🟢 FETCH SERVICE DETAILS                                                  */
   /* -------------------------------------------------------------------------- */
   useEffect(() => {
     const fetchData = async () => {
@@ -72,7 +72,7 @@ export default function ServiceGalleryManager() {
   }, [id]);
 
   /* -------------------------------------------------------------------------- */
-  /* 🟡 UPLOAD NEW IMAGE TO IMAGEKIT + SAVE TO MONGODB                         */
+  /* 🟡 UPLOAD NEW IMAGE TO IMAGEKIT + SAVE TO DB                              */
   /* -------------------------------------------------------------------------- */
   const handleUpload = async () => {
     const fileInput = fileInputRef.current;
@@ -103,7 +103,6 @@ export default function ServiceGalleryManager() {
         abortSignal: abortController.signal,
       });
 
-      // Add to MongoDB
       const addRes = await fetch(`/api/service-details/${id}/image`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -118,7 +117,10 @@ export default function ServiceGalleryManager() {
       if (!addRes.ok) throw new Error(addData.message);
 
       setGallery(addData.data.gallery || []);
-      toast.success("Image uploaded and added to gallery!");
+      toast.success("Image uploaded successfully!");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error) {
       console.error(error);
       if (error instanceof ImageKitAbortError) toast.error("Upload aborted");
@@ -128,7 +130,7 @@ export default function ServiceGalleryManager() {
         toast.error("Network error during upload");
       else if (error instanceof ImageKitServerError)
         toast.error("Server error during upload");
-      else toast.error("Unknown error occurred");
+      else toast.error("Unknown upload error");
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -136,7 +138,7 @@ export default function ServiceGalleryManager() {
   };
 
   /* -------------------------------------------------------------------------- */
-  /* 🔴 DELETE IMAGE (Triggered from Modal)                                    */
+  /* 🔴 DELETE IMAGE                                                          */
   /* -------------------------------------------------------------------------- */
   const handleDelete = async () => {
     if (!selectedImageId) return;
@@ -175,69 +177,83 @@ export default function ServiceGalleryManager() {
   };
 
   /* -------------------------------------------------------------------------- */
-  /* 🖼️ UI                                                                     */
+  /* 🖼️ UI                                                                    */
   /* -------------------------------------------------------------------------- */
   return (
-    <div className="min-h-screen bg-[#f9fafb] py-10 flex flex-col">
-      <div className="max-w-6xl mx-auto bg-white border border-amber-100 rounded-xl shadow-sm p-8 space-y-8">
-        {/* 📌 Service Header */}
+    <div className="min-h-screen bg-[#fafaf9] py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto bg-white border border-amber-100 rounded-2xl shadow-sm p-8 sm:p-10 space-y-10">
+        {/* Header */}
         {service && (
           <div className="border-b border-amber-100 pb-6">
-            <h1 className="text-2xl font-semibold text-[#1e293b] mb-2">
-              Service Name: {service.title}
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#1e293b] mb-2 flex items-center gap-2">
+              <ImageIcon className="text-amber-500 sm:size-8" />
+              Manage Images
             </h1>
-            <p className="text-[#475569] text-sm leading-relaxed">
-              Service Description: {service.description}
+            <p className="text-[#64748b] text-sm sm:text-base">
+              Service:{" "}
+              <span className="font-medium text-amber-600">
+                {service.title || "loading ..."}
+              </span>
             </p>
           </div>
         )}
 
-        {/* 📸 Upload Section */}
-        <div>
-          <h2 className="text-lg font-medium text-[#1e293b] mb-4">
+        {/* Upload Section */}
+        <div className="bg-amber-50 border border-amber-100 p-6 rounded-xl shadow-sm">
+          <h2 className="text-lg font-medium text-[#1e293b] mb-4 flex items-center gap-2">
+            <Upload className="text-amber-600" />
             Upload New Image
           </h2>
-          <Input type="file" accept="image/*" ref={fileInputRef} />
-          <Button
-            onClick={handleUpload}
-            disabled={uploading}
-            className="mt-3 bg-linear-to-r from-amber-500 to-amber-600 text-white"
-          >
-            {uploading
-              ? `Uploading... ${uploadProgress.toFixed(0)}%`
-              : "Upload Image"}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <Input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleUpload}
+              disabled={uploading}
+              className="bg-linear-to-r from-amber-500 to-amber-600 text-white hover:scale-[1.02] transition-transform"
+            >
+              {uploading
+                ? `Uploading... ${uploadProgress.toFixed(0)}%`
+                : "Upload"}
+            </Button>
+          </div>
 
           {uploading && (
-            <div className="w-full bg-amber-50 rounded-full h-2 mt-3">
+            <div className="w-full bg-amber-100 rounded-full h-2 mt-3 overflow-hidden">
               <div
-                className="bg-linear-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all"
+                className="bg-linear-to-r from-amber-500 to-amber-600 h-2 transition-all"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
           )}
         </div>
 
-        {/* 🖼️ Gallery Grid */}
+        {/* Gallery */}
         <div>
           <h2 className="text-lg font-medium text-[#1e293b] mb-4">
             Gallery Images
           </h2>
           {gallery.length === 0 ? (
-            <p className="text-center text-[#94a3b8]">No images in gallery</p>
+            <div className="text-center py-16 text-[#94a3b8] italic border border-dashed border-amber-200 rounded-xl">
+              No images yet. Start uploading above!
+            </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {gallery.map((item) => (
                 <div
                   key={item.imageFileId}
-                  className="relative group border border-amber-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                  className="relative group rounded-xl overflow-hidden shadow-sm border border-amber-100 bg-white hover:shadow-md transition-all"
                 >
                   <Image
                     src={item.imageUrl}
                     alt="Gallery Image"
-                    width={400}
-                    height={300}
-                    className="object-cover w-full h-48"
+                    width={500}
+                    height={400}
+                    className="object-cover w-full h-56 sm:h-52"
                   />
                   <button
                     onClick={() => {
@@ -245,7 +261,7 @@ export default function ServiceGalleryManager() {
                       setIsModalOpen(true);
                     }}
                     disabled={loading}
-                    className="absolute top-2 right-2 bg-red-500 text-white hover:text-[#1e293b] rounded-full px-2 py-2"
+                    className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
                   >
                     <Trash2 className="size-5" />
                   </button>
@@ -256,16 +272,16 @@ export default function ServiceGalleryManager() {
         </div>
       </div>
 
-      {/* 🧩 Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[#1e293b]">
-              Confirm Deletion
+            <DialogTitle className="text-[#1e293b] text-lg">
+              Confirm Image Deletion
             </DialogTitle>
           </DialogHeader>
 
-          <p className="text-sm text-[#475569]">
+          <p className="text-sm text-[#475569] leading-relaxed">
             Are you sure you want to delete this image? This action cannot be
             undone.
           </p>
