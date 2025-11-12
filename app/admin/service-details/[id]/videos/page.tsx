@@ -113,7 +113,7 @@ export default function ServiceVideoManager() {
     <div className="bg-[#fafaf9] p-6 sm:py-10 sm:px-10">
       <div className="max-w-6xl mx-auto bg-white border border-amber-100 rounded-2xl shadow-sm p-6 sm:p-10">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-3">
+        <div className="flex justify-between items-center mb-8 gap-3">
           <div>
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#1e293b] flex items-center gap-2">
               <Video className="text-amber-600 sm:size-8" /> Manage Videos

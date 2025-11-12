@@ -208,7 +208,7 @@ export default function AddServicePage() {
         {/* ─── Left Section: Form ─────────────────────────────── */}
         <div className="bg-white border border-amber-100 rounded-2xl shadow-sm p-8 space-y-6">
           <h2 className="text-xl font-semibold text-[#1e293b]">
-            Service Information
+            Create Service Card
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -241,13 +241,10 @@ export default function EditServicePage() {
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10">
         {/* Left: Form Section */}
         <div className="bg-white border border-amber-100 rounded-2xl shadow-sm p-6 sm:p-10 space-y-6">
-          <div className="text-center sm:text-left">
+          <div className="text-left">
             <h2 className="text-2xl font-semibold text-[#1e293b]">
-              Edit Service Information
+              Edit Service Card
             </h2>
-            <p className="text-sm text-[#64748b] mt-1">
-              Update your service title, description, and slug below.
-            </p>
           </div>
 
           <form onSubmit={handleUpdate} className="space-y-6">
@@ -275,17 +272,6 @@ export default function EditServicePage() {
                 placeholder="Describe the service"
                 className="min-h-[130px]"
                 disabled={loading}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#475569] mb-2">
-                Slug (auto-generated)
-              </label>
-              <Input
-                value={form.slug}
-                readOnly
-                className="bg-gray-50 border-gray-200"
               />
             </div>
 
