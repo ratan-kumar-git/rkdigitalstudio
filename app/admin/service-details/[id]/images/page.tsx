@@ -90,6 +90,7 @@ export default function ServiceGalleryManager() {
     try {
       const auth = await authenticator();
       const { signature, expire, token, publicKey } = auth;
+      const imgFolder = `rkdigitalstudio/gallery/${id}`
 
       const res = await upload({
         expire,
@@ -98,7 +99,7 @@ export default function ServiceGalleryManager() {
         publicKey,
         file,
         fileName: file.name,
-        folder: "rkdigitalstudio/gallery",
+        folder: imgFolder,
         onProgress: (e) => setUploadProgress((e.loaded / e.total) * 100),
         abortSignal: abortController.signal,
       });
@@ -180,7 +181,7 @@ export default function ServiceGalleryManager() {
   /* 🖼️ UI                                                                    */
   /* -------------------------------------------------------------------------- */
   return (
-    <div className="min-h-screen bg-[#fafaf9] py-10 px-4 sm:px-6 lg:px-8">
+    <div className="bg-[#fafaf9] p-6 sm:py-10 sm:px-10">
       <div className="max-w-6xl mx-auto bg-white border border-amber-100 rounded-2xl shadow-sm p-8 sm:p-10 space-y-10">
         {/* Header */}
         {service && (
@@ -261,7 +262,7 @@ export default function ServiceGalleryManager() {
                       setIsModalOpen(true);
                     }}
                     disabled={loading}
-                    className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                    className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full p-2 transition-all"
                   >
                     <Trash2 className="size-5" />
                   </button>

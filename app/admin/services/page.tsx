@@ -44,15 +44,15 @@ export default function AdminServicesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#fffefc] py-10 px-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#fffefc] p-6 sm:py-10 sm:px-10">
+      <div className="max-w-6xl mx-auto space-y-10">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">All Services</h1>
           <Link href="/admin/add-service">
             <Button
               size="lg"
-              className="flex items-center justify-center gap-2 bg-[#2563eb] hover:bg-[#1e40af] text-white"
+              className="flex items-center justify-center gap-2 w-full bg-linear-to-r from-amber-500 to-amber-600 text-white hover:scale-[1.02] transition"
             >
               <PlusCircle className="w-5 h-5" /> Add Service
             </Button>

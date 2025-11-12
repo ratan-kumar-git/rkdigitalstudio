@@ -112,7 +112,7 @@ const AdminServiceCard = ({ service, onDelete }: Props) => {
         {/* ─── Action Buttons ───────────────────── */}
         <div className="grid grid-cols-2 gap-3">
           {/* View */}
-          <Link href={`/services/${service.slug}`} className="flex-1">
+          <Link href={`/services/${service._id}`} className="flex-1">
             <Button
               variant="outline"
               size="sm"

@@ -50,7 +50,7 @@ const ServiceCard = (service: Service) => {
         </p>
 
         <Link
-          href={`/services/${service.slug}`}
+          href={`/services/${service._id}`}
           className="inline-block px-5 py-2 rounded-full bg-linear-to-r from-[#f59e0b] to-[#d97706] text-white font-semibold text-sm shadow-md hover:from-[#fbbf24] hover:to-[#f59e0b] transition-transform hover:scale-[1.05]"
         >
           View Details

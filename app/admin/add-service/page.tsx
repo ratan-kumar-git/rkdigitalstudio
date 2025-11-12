@@ -203,7 +203,7 @@ export default function AddServicePage() {
   /* 🎨 UI                                                                    */
   /* -------------------------------------------------------------------------- */
   return (
-    <div className="min-h-screen bg-[#fafaf9] py-10 px-4 sm:px-6 lg:px-8">
+    <div className="bg-[#fafaf9] p-6 sm:py-10 sm:px-10">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10">
         {/* ─── Left Section: Form ─────────────────────────────── */}
         <div className="bg-white border border-amber-100 rounded-2xl shadow-sm p-8 space-y-6">

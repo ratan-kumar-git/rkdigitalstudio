@@ -237,7 +237,7 @@ export default function EditServicePage() {
     );
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] py-10 px-4 sm:px-6 lg:px-8">
+    <div className="bg-[#f9fafb] p-6 sm:py-10 sm:px-10">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10">
         {/* Left: Form Section */}
         <div className="bg-white border border-amber-100 rounded-2xl shadow-sm p-6 sm:p-10 space-y-6">

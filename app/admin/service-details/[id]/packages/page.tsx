@@ -169,7 +169,7 @@ export default function PackageManager() {
   /* 🎨 UI SECTION                                                            */
   /* -------------------------------------------------------------------------- */
   return (
-    <div className="min-h-screen bg-[#fafaf9] py-10 px-4 sm:px-6 lg:px-8">
+    <div className="bg-[#fafaf9] p-6 sm:py-10 sm:px-10">
       <div className="max-w-6xl mx-auto bg-white border border-amber-100 rounded-2xl shadow-sm p-8 sm:p-10 space-y-10">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

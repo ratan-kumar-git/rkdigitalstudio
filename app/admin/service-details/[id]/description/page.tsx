@@ -109,7 +109,7 @@ export default function EditServiceDescription() {
         publicKey,
         file,
         fileName: file.name,
-        folder: "rkdigitalstudio/service-details-covers",
+        folder: "rkdigitalstudio/serviceCovers",
         onProgress: (e) => setUploadProgress((e.loaded / e.total) * 100),
         abortSignal: abortController.signal,
       });
@@ -212,7 +212,7 @@ export default function EditServiceDescription() {
       if (!res.ok) throw new Error(data.message || "Update failed");
 
       toast.success("Service detail updated successfully!");
-      router.push(`/admin/service-details/${id}/description`);
+      router.push("/admin/services");
     } catch (err) {
       console.error(err);
       toast.error("Update failed");
@@ -225,8 +225,8 @@ export default function EditServiceDescription() {
   /* 🎨 UI SECTION                                                            */
   /* -------------------------------------------------------------------------- */
   return (
-    <div className="min-h-screen bg-[#fafaf9] py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto bg-white border border-amber-100 rounded-2xl shadow-sm p-8 sm:p-10">
+    <div className="bg-[#fafaf9] p-6 sm:py-10 sm:px-10">
+      <div className="max-w-6xl mx-auto bg-white border border-amber-100 rounded-2xl shadow-sm p-8 sm:p-10">
         <h2 className="text-2xl sm:text-3xl font-semibold text-[#1e293b] mb-8 flex items-center gap-2">
           <FileText className="text-amber-600 sm:size-8" /> Edit Service Detail
         </h2>
@@ -314,7 +314,7 @@ export default function EditServiceDescription() {
                   type="button"
                   onClick={handleRemoveImage}
                   disabled={loading}
-                  className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all"
+                  className="absolute top-3 right-3 bg-red-500 text-white hover:bg-red-600 rounded-full p-2 transition-all"
                 >
                   <Trash2 className="size-5" />
                 </button>
