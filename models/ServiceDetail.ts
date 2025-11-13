@@ -13,6 +13,7 @@ export interface ICoverImage {
 }
 
 export interface IPackage {
+  _id: string;
   name: string;
   price: string;
   features: string[];
@@ -38,7 +39,7 @@ const PackageSchema = new Schema<IPackage>(
     features: { type: [String], required: true },
     highlight: { type: Boolean, default: false },
   },
-  { _id: false }
+  { _id: true }
 );
 
 const GalleryItemSchema = new Schema<IGalleryItem>(

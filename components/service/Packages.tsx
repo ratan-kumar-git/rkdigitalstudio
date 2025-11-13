@@ -1,12 +1,16 @@
 "use client";
 
 import PackageCard from "./PackageCard";
-import { PackageMap } from "./type";
+import { Package } from "./type";
 
-export default function Packages({ packageData }: { packageData: PackageMap }) {
-  const numberOfPackage = packageData
-    ? Object.keys(packageData).length
-    : 0;
+export default function Packages({
+  packageData,
+  serviceId,
+}: {
+  packageData: Package[];
+  serviceId: string;
+}) {
+  const numberOfPackage = packageData ? packageData.length : 0;
 
   return (
     <section className="bg-[#fffefc]" id="packages">
@@ -38,7 +42,7 @@ export default function Packages({ packageData }: { packageData: PackageMap }) {
             }`}
           >
             {Object.entries(packageData).map(([key, pkg]) => (
-              <PackageCard key={key} pkg={pkg} />
+              <PackageCard key={key} pkg={pkg} serviceId={serviceId} />
             ))}
           </div>
         )}

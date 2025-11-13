@@ -1,0 +1,39 @@
+import dbConnect from "@/lib/dbConnect";
+import Booking from "@/models/Booking";
+import { NextRequest, NextResponse } from "next/server";
+
+// GET -> /api/bookings/[userId]/route.ts
+// user -> get booking by id
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ userId: string }> }
+) {
+  try {
+    const { userId } = await context.params;
+    await dbConnect();
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "userId is required" },
+        { status: 400 }
+      );
+    }
+
+    const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
+
+    return NextResponse.json(
+      {
+        success: true,
+        count: bookings.length,
+        data: bookings,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error fetching bookings by userId:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch bookings" },
+      { status: 500 }
+    );
+  }
+}

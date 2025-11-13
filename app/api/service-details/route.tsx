@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
     // Create a default ServiceDetail document
     const newServiceDetail = new ServiceDetail({
       serviceId,
-      title: "Add your own title",
-      description: "Add your own description",
+      title: "Untitled Service",
+      description: "No description available for this service at the moment.",
       coverImage: null,
       packages: [],
       gallery: [],

@@ -7,7 +7,6 @@ import { Loader2 } from "lucide-react";
 
 import Heading from "@/components/service/Heading";
 import Packages from "@/components/service/Packages";
-import { PackageMap } from "@/components/service/type";
 import ServiceVideos from "@/components/service/ServiceVideos";
 import ImgGallery from "@/components/service/ImgGallery";
 
@@ -18,6 +17,7 @@ interface IGalleryItem {
 }
 
 interface IPackage {
+  _id: string;
   name: string;
   price: string;
   features: string[];
@@ -25,6 +25,7 @@ interface IPackage {
 }
 
 interface ServiceData {
+  serviceId: string;
   title: string;
   description: string;
   coverImage?: {
@@ -75,6 +76,7 @@ export default function WeddingPhotographyPage() {
   }
 
   const {
+    serviceId,
     title,
     description,
     coverImage,
@@ -84,19 +86,7 @@ export default function WeddingPhotographyPage() {
   } = serviceData;
 
   const fallbackImage = "/wedding1.jpg";
-
-  const packageData: PackageMap = Object.fromEntries(
-    packages.map((pkg) => [
-      pkg.name.toLowerCase(),
-      {
-        name: pkg.name,
-        price: `₹${pkg.price}`,
-        features: pkg.features,
-        highlight: pkg.highlight || false,
-      },
-    ])
-  );
-
+  
   return (
     <div className="bg-[#fffefc] min-h-screen space-y-16">
       <Heading
@@ -107,8 +97,8 @@ export default function WeddingPhotographyPage() {
         }
         imgUrl={coverImage?.imageUrl || fallbackImage}
       />
-
-      <Packages packageData={packageData} />
+      
+      <Packages packageData={packages} serviceId={serviceId} />
 
       <ImgGallery gallery={gallery} />
 

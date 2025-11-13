@@ -6,7 +6,7 @@ const HomeLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Navbar />
-      <main className="pt-[69px]">{children}</main>
+      <main className="pt-[62px]">{children}</main>
       <Footer />
     </>
   );
