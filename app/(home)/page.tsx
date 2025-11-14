@@ -1,4 +1,5 @@
 import HeroSection from "@/components/Home/HeroSection";
+import HowItWorksPage from "@/components/Home/HowItWorks";
 import Portfolio from "@/components/Home/Portfolio";
 import ServicesSection from "@/components/Home/ServicesSection";
 import Testimonials from "@/components/Home/Testimonials";
@@ -9,9 +10,10 @@ export default function HomePage() {
     <>
       <HeroSection />
       <ServicesSection />
+      <HowItWorksPage />
+      <Testimonials />
       <Portfolio />
       <VideoSamples />
-      <Testimonials />
     </>
   );
 }
