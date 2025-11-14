@@ -151,48 +151,14 @@ export default function AdminDashboard() {
   /* UI (Improved + Mobile Responsive + Quick Buttons)               */
   /* -------------------------------------------------------------- */
   return (
-    <section className="max-w-7xl mx-auto px-4 py-8">
+    <section className="max-w-6xl mx-auto px-4 py-8">
       {/* Header + Quick Navigation Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-amber-700">
-          Admin Dashboard
-        </h1>
-
-        {/* Quick Action Buttons */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => router.push("/admin/booking")}
-            className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm sm:text-base hover:bg-amber-700 transition"
-          >
-            Bookings
-          </button>
-
-          <button
-            onClick={() => router.push("/admin/services")}
-            className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm sm:text-base hover:bg-amber-700 transition"
-          >
-            Services
-          </button>
-
-          <button
-            onClick={() => router.push("/admin/messages")}
-            className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm sm:text-base hover:bg-amber-700 transition"
-          >
-            Messages
-          </button>
-        </div>
-      </div>
+      <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#1e293b] mb-8">
+        Admin <span className="text-[#d97706]">Dashboard</span>
+      </h1>
 
       {/* Metric Grid */}
-      <div
-        className="
-      grid 
-      grid-cols-1 
-      sm:grid-cols-2 
-      lg:grid-cols-3 
-      gap-5
-      "
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:ga" >
         <Card
           title="Total Services"
           value={stats.totalServices}
@@ -287,13 +253,11 @@ function Card({ title, value, icon }: CardProps) {
       "
     >
       {/* Icon */}
-      <div className="p-3 bg-amber-100 rounded-xl">
-        {icon}
-      </div>
+      <div className="p-3 bg-amber-100 rounded-xl">{icon}</div>
 
       {/* Text */}
       <div>
-        <p className="text-gray-600 text-xs sm:text-sm">{title}</p>
+        <p className="text-gray-600 text-sm">{title}</p>
         <h3 className="text-2xl sm:text-3xl font-bold text-amber-700">
           {value}
         </h3>
@@ -301,4 +265,3 @@ function Card({ title, value, icon }: CardProps) {
     </div>
   );
 }
-

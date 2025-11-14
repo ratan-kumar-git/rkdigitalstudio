@@ -9,7 +9,6 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const body = await req.json();
-    console.log(body);
     
     const {
       userId,

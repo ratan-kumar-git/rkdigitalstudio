@@ -15,6 +15,7 @@ import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function UserMenu() {
   const router = useRouter();
@@ -82,7 +83,7 @@ export default function UserMenu() {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem className="cursor-pointer flex items-center gap-2 text-gray-700 hover:bg-gray-100">
-          <User className="w-4 h-4 text-gray-500" /> Profile
+          <User className="w-4 h-4 text-gray-500" /> <Link href={isAdmin ? "/admin/profile" : "/profile"}>Profile</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

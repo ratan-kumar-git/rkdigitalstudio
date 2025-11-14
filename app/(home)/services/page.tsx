@@ -45,7 +45,7 @@ export default function ServicesPage() {
   if (loading) return <LoadingScreen message="Loading services..." />;
 
   return (
-    <main className="bg-[#fffefc] min-h-screen py-24">
+    <main className="bg-[#fffefc] min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

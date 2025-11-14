@@ -2,24 +2,24 @@ import dbConnect from "@/lib/dbConnect";
 import Booking from "@/models/Booking";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET -> /api/bookings/[userId]/route.ts
+// GET -> /api/bookings/[id -> userId]/route.ts
 // user -> get booking by id
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ userId: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await context.params;
+    const { id } = await context.params;
     await dbConnect();
 
-    if (!userId) {
+    if (!id) {
       return NextResponse.json(
         { error: "userId is required" },
         { status: 400 }
       );
     }
 
-    const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
+    const bookings = await Booking.find({ userId: id }).sort({ createdAt: -1 });
 
     return NextResponse.json(
       {
@@ -38,13 +38,16 @@ export async function GET(
   }
 }
 
+
+// PUT -> /api/bookings/[id]/route.ts
+// Admin -> update status of booking by booking._id
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ userId: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    const { userId } = await context.params;
+    const { id } = await context.params;
     const { status } = await req.json();
 
     const allowed = ["pending", "confirmed", "completed", "cancelled"];
@@ -55,7 +58,7 @@ export async function PUT(
       );
 
     const updated = await Booking.findByIdAndUpdate(
-      userId,
+      id,
       { status },
       { new: true }
     );

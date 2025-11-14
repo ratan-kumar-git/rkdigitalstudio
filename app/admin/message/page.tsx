@@ -110,9 +110,9 @@ export default function AdminMessagesPage() {
   }
 
   return (
-    <section className="max-w-6xl mx-auto py-10 px-4">
-      <h1 className="text-3xl font-serif font-bold mb-8 text-[#1e293b]">
-        Contact Messages
+    <section className="max-w-6xl mx-auto py-12 px-4">
+      <h1 className="text-4xl font-serif font-bold text-[#1e293b] mb-8">
+        Contact <span className="text-[#d97706]">Messages</span>
       </h1>
 
       {messages.length === 0 ? (

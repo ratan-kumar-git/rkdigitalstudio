@@ -123,8 +123,8 @@ export default function BookingHistoryPage() {
   return (
     <section className="max-w-6xl mx-auto py-10 px-4">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-serif font-bold text-[#1e293b]">
-          My Bookings
+        <h1 className="text-4xl font-serif font-bold text-[#1e293b]">
+          My <span className="text-[#d97706]">Bookings</span>
         </h1>
 
         <Link
