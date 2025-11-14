@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-linear-to-b from-[#fff7ed] to-[#ffffff]">
-      <div className="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-10 px-6 py-20 md:py-28">
+      <div className="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-10 px-6 py-20 md:pt-24">
         {/* Left Content */}
         <div className="flex-1 text-center md:text-left">
           <h1 className="font-serif text-5xl md:text-6xl font-bold text-[#1e293b] leading-tight">

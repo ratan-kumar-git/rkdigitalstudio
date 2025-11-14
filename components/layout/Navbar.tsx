@@ -35,6 +35,7 @@ export default function Navbar() {
       { href: "/admin/services", label: "Services" },
       { href: "/admin/add-service", label: "Add Service" },
       { href: "/admin/booking", label: "Booking" },
+      { href: "/admin/message", label: "Message" },
     ];
   } else {
     navLinks = [
