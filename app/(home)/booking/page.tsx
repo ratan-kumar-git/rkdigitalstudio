@@ -17,6 +17,7 @@ import {
   Wallet,
   IndianRupeeIcon,
   PackageCheckIcon,
+  CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -50,6 +51,7 @@ export default function BookingHistoryPage() {
 
   useEffect(() => {
     if (isPending) return;
+
     if (!data?.user) {
       toast.error("Please sign in to proceed with your booking.");
       router.replace("/signin");
@@ -165,7 +167,7 @@ export default function BookingHistoryPage() {
                 </p>
               </div>
 
-              {/* Status Column */}
+              {/* Status */}
               <div className="text-right">
                 <Badge
                   className={`px-3 py-1 text-sm rounded-full ${
@@ -173,12 +175,30 @@ export default function BookingHistoryPage() {
                       ? "bg-green-100 text-green-700 border border-green-300"
                       : b.status === "cancelled"
                       ? "bg-red-100 text-red-700 border border-red-300"
+                      : b.status === "completed"
+                      ? "bg-blue-100 text-blue-700 border border-blue-300"
                       : "bg-yellow-100 text-yellow-700 border border-yellow-300"
                   }`}
                 >
                   {b.status.toUpperCase()}
                 </Badge>
               </div>
+            </div>
+
+            {/* ⭐ Section 1.1 – Features */}
+            <div className="mt-4 bg-amber-50/60 border border-amber-100 p-4 rounded-xl">
+              <p className="text-sm font-semibold text-amber-700 mb-2">
+                Features Included:
+              </p>
+
+              <ul className="space-y-1 text-gray-700 text-sm">
+                {b.packageFeatures.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-amber-600" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {/* Section 2 — Customer Info */}
@@ -239,7 +259,7 @@ export default function BookingHistoryPage() {
               </div>
             </div>
 
-            {/* Section 4 – Footer Timestamp */}
+            {/* Footer Timestamp */}
             <div className="mt-5 pt-4 border-t border-gray-200 flex items-center justify-between text-sm text-gray-500">
               <span className="flex items-center gap-2">
                 <Clock4 className="w-4 h-4 text-gray-500" />

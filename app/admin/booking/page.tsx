@@ -17,9 +17,9 @@ import {
   PackageCheckIcon,
   BookCheck,
   IndianRupeeIcon,
-  ArrowDownWideNarrow,
-  ArrowUpWideNarrow,
+  CheckCircle2,
 } from "lucide-react";
+
 import {
   Select,
   SelectContent,
@@ -27,6 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 interface Booking {
@@ -53,12 +56,24 @@ interface Booking {
 export default function AdminBookingPage() {
   const router = useRouter();
   const { data, isPending } = authClient.useSession();
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sort, setSort] = useState<"new" | "old">("new");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  // ─── Auth Check for Admin ─────────────────────────
+  const [sort, setSort] = useState<"new" | "old">("new");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // modal states
+  const [actionBookingId, setActionBookingId] = useState<string | null>(null);
+  const [actionType, setActionType] = useState<
+    "pending" | "confirmed" | "completed" | "cancelled" | null
+  >(null);
+  const [isActionModal, setIsActionModal] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+
+  /* -------------------------------------------------------------------------- */
+  /* 🟡 Auth Check                                                              */
+  /* -------------------------------------------------------------------------- */
   useEffect(() => {
     if (isPending) return;
 
@@ -76,7 +91,9 @@ export default function AdminBookingPage() {
     }
   }, [data, isPending, router]);
 
-  // ─── Fetch All Bookings ───────────────────────────
+  /* -------------------------------------------------------------------------- */
+  /* 🔵 Fetch All Bookings                                                      */
+  /* -------------------------------------------------------------------------- */
   useEffect(() => {
     if (!data?.user?.email) return;
 
@@ -102,7 +119,56 @@ export default function AdminBookingPage() {
     loadBookings();
   }, [data]);
 
-  // ─── Loading UI ───────────────────────────────────
+  /* -------------------------------------------------------------------------- */
+  /* 🔴 Open Confirmation Modal                                                 */
+  /* -------------------------------------------------------------------------- */
+  const openActionModal = (
+    id: string,
+    type: "pending" | "confirmed" | "completed" | "cancelled"
+  ) => {
+    setActionBookingId(id);
+    setActionType(type);
+    setIsActionModal(true);
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* 🟢 Handle Update Status                                                    */
+  /* -------------------------------------------------------------------------- */
+  const handleUpdateStatus = async () => {
+    if (!actionBookingId || !actionType) return;
+
+    setIsActionLoading(true);
+
+    try {
+      const res = await fetch(`/api/bookings/${actionBookingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: actionType }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      // update UI
+      setBookings((prev) =>
+        prev.map((item) =>
+          item._id === actionBookingId ? { ...item, status: actionType } : item
+        )
+      );
+
+      toast.success(`Status updated to ${actionType}`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update status");
+    } finally {
+      setIsActionModal(false);
+      setIsActionLoading(false);
+    }
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* ⏳ Loading Screen                                                          */
+  /* -------------------------------------------------------------------------- */
   if (isPending || loading) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] text-gray-600">
@@ -112,23 +178,24 @@ export default function AdminBookingPage() {
     );
   }
 
-  // ─── Empty UI ─────────────────────────────────────
+  /* -------------------------------------------------------------------------- */
+  /* 🟥 Empty UI                                                                 */
+  /* -------------------------------------------------------------------------- */
   if (bookings.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-6">
         <BookCheck className="w-16 h-16 text-amber-500 mb-4 opacity-80" />
-        <p className="text-xl font-semibold text-gray-800">
-          No Booking Requests
-        </p>
+        <p className="text-xl font-semibold text-gray-800">No Booking Requests</p>
         <p className="text-sm text-gray-500 mt-1 max-w-sm">
-          All booking requests will appear here once users start booking
-          services.
+          All booking requests will appear here once users start booking services.
         </p>
       </div>
     );
   }
 
-  // ─── Sorting & Filtering ──────────────────────────
+  /* -------------------------------------------------------------------------- */
+  /* 🍀 Sorting + Filtering                                                     */
+  /* -------------------------------------------------------------------------- */
   const sortedBookings = [...bookings]
     .filter((b) => (statusFilter === "all" ? true : b.status === statusFilter))
     .sort((a, b) =>
@@ -137,102 +204,56 @@ export default function AdminBookingPage() {
         : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
 
-  // ─── Main UI ──────────────────────────────────────
+  /* -------------------------------------------------------------------------- */
+  /* 🟢 UI                                                                      */
+  /* -------------------------------------------------------------------------- */
   return (
     <section className="max-w-7xl mx-auto py-10 px-4">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
         <h1 className="text-3xl font-serif font-bold text-[#1e293b]">
           All Booking Requests
         </h1>
 
         <div className="flex items-center gap-3">
-          {/* Status Filter */}
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger
-              className="w-[150px] rounded-lg border-amber-200 bg-amber-50/40 
-                 text-[#b45309] shadow-sm hover:bg-amber-50 transition"
-            >
+            <SelectTrigger className="w-[150px] border-amber-300 bg-amber-50/50 text-amber-800">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
 
-            <SelectContent className="border border-amber-200 bg-white shadow-lg rounded-lg">
-              <SelectItem
-                value="all"
-                className="cursor-pointer text-gray-700 focus:bg-amber-100 focus:text-amber-800"
-              >
-                All Status
-              </SelectItem>
-              <SelectItem
-                value="pending"
-                className="cursor-pointer text-yellow-700 focus:bg-yellow-100 focus:text-yellow-800"
-              >
-                Pending
-              </SelectItem>
-              <SelectItem
-                value="confirmed"
-                className="cursor-pointer text-green-700 focus:bg-green-100 focus:text-green-800"
-              >
-                Confirmed
-              </SelectItem>
-              <SelectItem
-                value="completed"
-                className="cursor-pointer text-blue-700 focus:bg-blue-100 focus:text-blue-800"
-              >
-                Completed
-              </SelectItem>
-              <SelectItem
-                value="cancelled"
-                className="cursor-pointer text-red-700 focus:bg-red-100 focus:text-red-800"
-              >
-                Cancelled
-              </SelectItem>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="confirmed">Confirmed</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
 
-          {/* Sort New/Old */}
           <Select value={sort} onValueChange={(v) => setSort(v as never)}>
-            <SelectTrigger
-              className="w-40 rounded-lg border-amber-200 bg-amber-50/40 
-                 text-[#b45309] shadow-sm hover:bg-amber-50 transition"
-            >
+            <SelectTrigger className="w-[150px] border-amber-300 bg-amber-50/50 text-amber-800">
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
 
-            <SelectContent className="border border-amber-200 bg-white shadow-lg rounded-lg">
-              <SelectItem
-                value="new"
-                className="cursor-pointer text-gray-700 focus:bg-amber-100 focus:text-amber-800"
-              >
-                <div className="flex items-center gap-2">
-                  <ArrowDownWideNarrow className="h-4 w-4 text-amber-600" />
-                  Newest First
-                </div>
-              </SelectItem>
-
-              <SelectItem
-                value="old"
-                className="cursor-pointer text-gray-700 focus:bg-amber-100 focus:text-amber-800"
-              >
-                <div className="flex items-center gap-2">
-                  <ArrowUpWideNarrow className="h-4 w-4 text-amber-600" />
-                  Oldest First
-                </div>
-              </SelectItem>
+            <SelectContent>
+              <SelectItem value="new">Newest First</SelectItem>
+              <SelectItem value="old">Oldest First</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      <div className="space-y-8">
+      {/* Booking List */}
+      <div className="space-y-8 pb-20">
         {sortedBookings.map((b) => (
           <div
             key={b._id}
             className="bg-white border border-amber-100 rounded-2xl shadow-md hover:shadow-lg transition-all p-6"
           >
-            {/* Section 1 — Service */}
+            {/* Service */}
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-xl font-semibold text-[#b45309]">
+                <h2 className="text-xl font-semibold text-amber-700">
                   {b.serviceTitle}
                 </h2>
 
@@ -244,96 +265,136 @@ export default function AdminBookingPage() {
                   <IndianRupeeIcon className="w-4 h-4 text-amber-600" />
                   {b.packagePrice}
                 </p>
-
                 <p className="text-gray-600 text-sm flex items-center gap-2 mt-1">
                   <CalendarDays className="w-4 h-4 text-amber-600" />
-                  {new Date(b.bookingDate).toLocaleDateString("en-IN", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {new Date(b.bookingDate).toLocaleDateString("en-IN")}
                 </p>
               </div>
 
-              <div className="text-right">
-                <Badge
-                  className={`px-3 py-1 text-sm rounded-full ${
-                    b.status === "confirmed"
-                      ? "bg-green-100 text-green-700 border border-green-300"
-                      : b.status === "cancelled"
-                      ? "bg-red-100 text-red-700 border border-red-300"
-                      : b.status === "completed"
-                      ? "bg-blue-100 text-blue-700 border border-blue-300"
-                      : "bg-yellow-100 text-yellow-700 border border-yellow-300"
-                  }`}
-                >
-                  {b.status.toUpperCase()}
-                </Badge>
-              </div>
+              <Badge
+                className={`px-3 py-1 text-sm rounded-full ${
+                  b.status === "confirmed"
+                    ? "bg-green-100 text-green-700 border-green-300"
+                    : b.status === "cancelled"
+                    ? "bg-red-100 text-red-700 border-red-300"
+                    : b.status === "completed"
+                    ? "bg-blue-100 text-blue-700 border-blue-300"
+                    : "bg-yellow-100 text-yellow-700 border-yellow-300"
+                }`}
+              >
+                {b.status.toUpperCase()}
+              </Badge>
             </div>
 
-            {/* Section 2 — Customer Info */}
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+            {/* Features */}
+            <div className="mt-4 bg-amber-50/50 border border-amber-100 p-4 rounded-xl">
+              <p className="text-sm font-semibold text-amber-700 mb-2">
+                Features Included:
+              </p>
+
+              <ul className="space-y-1 text-gray-700 text-sm">
+                {b.packageFeatures.map((f, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-amber-600" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Customer Info */}
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
               <div>
                 <p className="flex items-center gap-2 text-gray-700">
-                  <User2 className="w-4 h-4 text-gray-700" />
+                  <User2 className="w-4 h-4" />
                   {b.fullName}
                 </p>
-                <p className="flex items-center gap-2 text-gray-700 mt-1">
-                  <Mail className="w-4 h-4 text-gray-700" />
+                <p className="flex items-center gap-2 mt-1 text-gray-700">
+                  <Mail className="w-4 h-4" />
                   {b.email}
                 </p>
               </div>
 
               <div>
                 <p className="flex items-center gap-2 text-gray-700">
-                  <Phone className="w-4 h-4 text-gray-700" />
+                  <Phone className="w-4 h-4" />
                   {b.phone}
                 </p>
-                <p className="flex items-center gap-2 text-gray-700 mt-1">
-                  <MapPin className="w-4 h-4 text-gray-700" />
+                <p className="flex items-center gap-2 mt-1 text-gray-700">
+                  <MapPin className="w-4 h-4" />
                   {b.address}
                 </p>
               </div>
             </div>
 
-            {/* Section 3 – Payment Info */}
+            {/* Payment */}
             <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="p-3 bg-gray-50 border rounded-xl">
                 <p className="text-xs text-gray-500">Payment Mode</p>
-                <p className="font-semibold text-gray-800 capitalize flex items-center gap-1">
-                  <Wallet className="w-4 h-4 text-gray-700" />
+                <p className="font-semibold text-gray-700 capitalize flex items-center gap-1">
+                  <Wallet className="w-4 h-4" />
                   {b.paymentMode}
                 </p>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="p-3 bg-gray-50 border rounded-xl">
                 <p className="text-xs text-gray-500">Amount Paid</p>
-                <p className="font-semibold text-gray-800 flex items-center gap-1">
-                  <IndianRupee className="w-4 h-4 text-gray-700" />
+                <p className="font-semibold text-gray-700 flex items-center gap-1">
+                  <IndianRupee className="w-4 h-4" />
                   {b.amountPaid}
                 </p>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="p-3 bg-gray-50 border rounded-xl">
                 <p className="text-xs text-gray-500">Payment Status</p>
-                <p className="font-semibold text-gray-800 capitalize">
+                <p className="font-semibold text-gray-700 capitalize">
                   {b.paymentStatus}
                 </p>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="p-3 bg-gray-50 border rounded-xl">
                 <p className="text-xs text-gray-500">Booking Status</p>
-                <p className="font-semibold text-gray-800 capitalize">
+                <p className="font-semibold text-gray-700 capitalize">
                   {b.status}
                 </p>
               </div>
             </div>
 
-            {/* Footer Timestamp */}
+            {/* ACTION BUTTONS */}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                onClick={() => openActionModal(b._id, "pending")}
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition shadow-sm"
+              >
+                Mark Pending
+              </button>
+
+              <button
+                onClick={() => openActionModal(b._id, "confirmed")}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-sm"
+              >
+                Confirm
+              </button>
+
+              <button
+                onClick={() => openActionModal(b._id, "completed")}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm"
+              >
+                Complete
+              </button>
+
+              <button
+                onClick={() => openActionModal(b._id, "cancelled")}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm"
+              >
+                Cancel
+              </button>
+            </div>
+
+            {/* Timestamp */}
             <div className="mt-5 pt-4 border-t border-gray-200 flex items-center justify-between text-sm text-gray-500">
               <span className="flex items-center gap-2">
-                <Clock4 className="w-4 h-4 text-gray-500" />
+                <Clock4 className="w-4 h-4" />
                 Requested on{" "}
                 {new Date(b.createdAt).toLocaleString("en-IN", {
                   dateStyle: "medium",
@@ -344,6 +405,38 @@ export default function AdminBookingPage() {
           </div>
         ))}
       </div>
+
+      {/* Confirmation Modal */}
+      <Dialog open={isActionModal} onOpenChange={setIsActionModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Action</DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-gray-600">
+            Are you sure you want to set the booking status to{" "}
+            <span className="font-semibold text-amber-700">{actionType}</span>?
+          </p>
+
+          <DialogFooter className="mt-4 flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsActionModal(false)}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              onClick={handleUpdateStatus}
+              disabled={isActionLoading}
+              className="bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-2"
+            >
+              {isActionLoading && <Spinner className="w-4 h-4 text-white" />}
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

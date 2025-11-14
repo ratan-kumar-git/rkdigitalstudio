@@ -37,3 +37,39 @@ export async function GET(
     );
   }
 }
+
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ userId: string }> }
+) {
+  try {
+    await dbConnect();
+    const { userId } = await context.params;
+    const { status } = await req.json();
+
+    const allowed = ["pending", "confirmed", "completed", "cancelled"];
+    if (!allowed.includes(status))
+      return NextResponse.json(
+        { success: false, message: "Invalid status" },
+        { status: 400 }
+      );
+
+    const updated = await Booking.findByIdAndUpdate(
+      userId,
+      { status },
+      { new: true }
+    );
+
+    return NextResponse.json(
+      { success: true, data: updated },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { success: false, message: "Server error" },
+      { status: 500 }
+    );
+  }
+}
+

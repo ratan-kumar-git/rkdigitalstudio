@@ -53,8 +53,8 @@ const GalleryItemSchema = new Schema<IGalleryItem>(
 
 const CoverImageSchema = new Schema<ICoverImage>(
   {
-    imageUrl: { type: String, required: true, trim: true },
-    imageFileId: { type: String, required: true, trim: true },
+    imageUrl: { type: String, required: false, trim: true },
+    imageFileId: { type: String, required: false, trim: true },
     thumbnailUrl: { type: String, default: "", trim: true },
   },
   { _id: false }

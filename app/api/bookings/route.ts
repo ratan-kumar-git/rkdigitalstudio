@@ -59,7 +59,7 @@ export async function POST(req: Request) {
 }
 
 // GET -> /api/bookings/route.ts
-// user -> get all booking
+// Admin -> get all booking
 export async function GET() {
   try {
     await dbConnect();
