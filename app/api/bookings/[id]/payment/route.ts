@@ -1,14 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Booking from "@/models/Booking";
+import { requireAdmin } from "@/lib/apiAuth";
 
 // PUT -> /api/bookings/[id]/payment/route.ts
 // Admin -> update amoutpaid of booking by booking._id
 export async function PUT(
-  req: Request,
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
 
     const { id } = await context.params;

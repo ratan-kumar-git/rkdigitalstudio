@@ -1,7 +1,12 @@
-import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/apiAuth";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+// @adminOnly
+export async function POST(req: NextRequest) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     const { fileId } = await req.json();
     if (!fileId) {
       return NextResponse.json({ success: false, message: "Missing fileId" }, { status: 400 });

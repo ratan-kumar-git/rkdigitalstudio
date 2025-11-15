@@ -1,8 +1,9 @@
+import { requireAdmin } from "@/lib/apiAuth";
 import dbConnect from "@/lib/dbConnect";
 import { Message } from "@/models/Message";
 import { NextRequest, NextResponse } from "next/server";
 
-
+// @public
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
@@ -36,9 +37,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
-
-export async function GET() {
+// @adminonly
+export async function GET(req: NextRequest) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+    
     await dbConnect();
 
     const messages = await Message.find().sort({ createdAt: -1 });

@@ -1,12 +1,16 @@
+import { requireAdmin, requireUser } from "@/lib/apiAuth";
 import dbConnect from "@/lib/dbConnect";
 import Booking from "@/models/Booking";
 import ServiceDetail from "@/models/ServiceDetail";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // POST -> /api/bookings/route.ts 
 // user -> create booking
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const { authorized, response } = await requireUser(req);
+    if (!authorized) return response;
+
     await dbConnect();
     const body = await req.json();
     
@@ -59,8 +63,11 @@ export async function POST(req: Request) {
 
 // GET -> /api/bookings/route.ts
 // Admin -> get all booking
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
 
     const bookings = await Booking.find({})

@@ -4,6 +4,7 @@ import dbConnect from "@/lib/dbConnect";
 import ServiceDetail from "@/models/ServiceDetail";
 
 // Fetch a specific service detail by ID (GET)
+// @public
 export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }

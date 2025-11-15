@@ -1,14 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Service from "@/models/Service";
-
+import { requireAdmin } from "@/lib/apiAuth";
 
 // GET /api/service/:id
+// @adminonly
 export async function GET(
-  req: Request,
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     const { id } = await context.params;
     await dbConnect();
     const service = await Service.findById(id);
@@ -30,14 +34,18 @@ export async function GET(
 }
 
 // PUT /api/service/:id
+// @adminonly
 export async function PUT(
-  req: Request,
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     const { id } = await context.params;
     const body = await req.json();
-    await dbConnect(); 
+    await dbConnect();
     const updated = await Service.findByIdAndUpdate(id, body, { new: true });
     if (!updated) {
       return NextResponse.json(
@@ -60,11 +68,15 @@ export async function PUT(
 }
 
 // DELETE /api/service/:id
+// @AdminOnly
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     const { id } = await context.params;
     await dbConnect();
 
@@ -88,5 +100,3 @@ export async function DELETE(
     );
   }
 }
-
-

@@ -1,11 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import Service from "@/models/Service";
 import dbConnect from "@/lib/dbConnect";
+import { requireAdmin } from "@/lib/apiAuth";
 
 // POST /api/service → Save new service
-export async function POST(req: Request) {
+// @adminOnly
+export async function POST(req: NextRequest) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
     await dbConnect();
     const body = await req.json();
     const { slug, title, description, imageUrl, imageFileId } = body;
@@ -49,6 +53,7 @@ export async function POST(req: Request) {
 }
 
 // GET /api/service → Fetch all services
+// @public
 export async function GET() {
   try {
     await dbConnect();

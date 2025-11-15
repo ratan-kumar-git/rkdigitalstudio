@@ -1,6 +1,10 @@
+import { requireAdmin } from "@/lib/apiAuth";
 import { getUploadAuthParams } from "@imagekit/next/server"
+import { NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
     // Your application logic to authenticate the user
     // For example, you can check if the user is logged in or has the necessary permissions
     // If the user is not authenticated, you can return an error response

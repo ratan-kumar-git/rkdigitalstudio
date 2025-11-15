@@ -1,3 +1,4 @@
+import { requireAdmin, requireUser } from "@/lib/apiAuth";
 import dbConnect from "@/lib/dbConnect";
 import Booking from "@/models/Booking";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,6 +10,9 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireUser(req);
+    if (!authorized) return response;
+
     const { id } = await context.params;
     await dbConnect();
 
@@ -46,6 +50,9 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
     const { id } = await context.params;
     const { status } = await req.json();

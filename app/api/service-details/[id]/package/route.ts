@@ -1,16 +1,19 @@
+import { requireAdmin } from "@/lib/apiAuth";
 import dbConnect from "@/lib/dbConnect";
 import ServiceDetail from "@/models/ServiceDetail";
 import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-/* -------------------------------------------------------------------------- */
-/* 🟡 ADD PACKAGE                                                             */
-/* -------------------------------------------------------------------------- */
+// POST "/api/service-details/[id]/package" - add package
+// @AdminOnly
 export async function POST(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
     const { id } = await context.params;
     const { name, price, features, highlight } = await req.json();
@@ -55,14 +58,16 @@ export async function POST(
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* 🔵 UPDATE PACKAGE                                                         */
-/* -------------------------------------------------------------------------- */
+// POST "/api/service-details/[id]/package" - update package
+// @AdminOnly
 export async function PUT(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
     const { id } = await context.params;
     const { index, name, price, features, highlight } = await req.json();
@@ -103,14 +108,16 @@ export async function PUT(
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* 🔴 DELETE PACKAGE                                                         */
-/* -------------------------------------------------------------------------- */
+// Delete "/api/service-details/[id]/package" - delete package
+// @AdminOnly
 export async function DELETE(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+    
     await dbConnect();
     const { id } = await context.params;
     const { index } = await req.json();

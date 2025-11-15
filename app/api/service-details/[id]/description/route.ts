@@ -1,14 +1,19 @@
+import { requireAdmin } from "@/lib/apiAuth";
 import dbConnect from "@/lib/dbConnect";
 import ServiceDetail from "@/models/ServiceDetail";
 import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-// Update a service detail (PUT)
+// POUT "/api/service-details/[id]/description" - update description 
+// @AdminOnly
 export async function PUT(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
     const { id } = await context.params;
 

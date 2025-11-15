@@ -1,16 +1,19 @@
+import { requireAdmin } from "@/lib/apiAuth";
 import dbConnect from "@/lib/dbConnect";
 import ServiceDetail from "@/models/ServiceDetail";
 import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-/* ------------------------------------- */
-/* 🟢 ADD IMAGE TO GALLERY               */
-/* ------------------------------------- */
+// POST "/api/service-details/[id]/image" - update image url in db
+// @AdminOnly
 export async function POST(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
     const { id } = await context.params;
 
@@ -74,14 +77,16 @@ export async function POST(
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* 🔴 DELETE IMAGE FROM GALLERY + ImageKit Deletion                           */
-/* -------------------------------------------------------------------------- */
+// DELETE "/api/service-details/[id]/image" - delete image url in db
+// @AdminOnly
 export async function DELETE(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
     const { id } = await context.params;
 

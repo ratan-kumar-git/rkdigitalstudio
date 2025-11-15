@@ -2,12 +2,17 @@ import dbConnect from "@/lib/dbConnect";
 import { Message } from "@/models/Message";
 import { NextRequest, NextResponse } from "next/server";
 import { Types } from "mongoose";
+import { requireAdmin } from "@/lib/apiAuth";
 
+// @adminOnly
 export async function DELETE(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+
     await dbConnect();
     const { id } = await context.params;
 

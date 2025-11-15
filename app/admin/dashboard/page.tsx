@@ -20,21 +20,6 @@ import {
 /* -------------------------------------------------------------- */
 /* TYPES                                                          */
 /* -------------------------------------------------------------- */
-interface IBooking {
-  _id: string;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
-  packagePrice: string;
-  amountPaid: number;
-}
-
-interface IService {
-  _id: string;
-}
-
-interface IMessage {
-  _id: string;
-}
-
 interface DashboardStats {
   totalServices: number;
   totalBookings: number;
@@ -91,42 +76,10 @@ export default function AdminDashboard() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [servicesRes, bookingsRes, messagesRes] = await Promise.all([
-          fetch("/api/service"),
-          fetch("/api/bookings"),
-          fetch("/api/message"),
-        ]);
-
-        const servicesJson = await servicesRes.json();
-        const bookingsJson = await bookingsRes.json();
-        const messagesJson = await messagesRes.json();
-
-        const services: IService[] = servicesJson.data || [];
-        const bookings: IBooking[] = bookingsJson.data || [];
-        const messages: IMessage[] = messagesJson.data || [];
-
-        const totalPrice = bookings.reduce(
-          (sum, b) => sum + Number(b.packagePrice || 0),
-          0
-        );
-
-        const totalPaid = bookings.reduce(
-          (sum, b) => sum + Number(b.amountPaid || 0),
-          0
-        );
-
-        setStats({
-          totalServices: services.length,
-          totalBookings: bookings.length,
-          pending: bookings.filter((b) => b.status === "pending").length,
-          confirmed: bookings.filter((b) => b.status === "confirmed").length,
-          completed: bookings.filter((b) => b.status === "completed").length,
-          cancelled: bookings.filter((b) => b.status === "cancelled").length,
-          totalEarnings: totalPaid,
-          amountPaid: totalPaid,
-          dues: totalPrice - totalPaid,
-          totalMessages: messages.length,
-        });
+        const res = await fetch("/api/dashboard")
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Error in featch dashboard data");
+        setStats(data.data);
       } catch (err) {
         console.error(err);
         toast.error("Failed to load dashboard data.");

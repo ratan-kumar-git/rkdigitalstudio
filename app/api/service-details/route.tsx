@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { Types } from "mongoose";
 import dbConnect from "@/lib/dbConnect";
 import ServiceDetail from "@/models/ServiceDetail";
+import { requireAdmin } from "@/lib/apiAuth";
 
 // POST "/api/service-details" - for defult data
+// @adminOnly
 export async function POST(req: NextRequest) {
   try {
+    const { authorized, response } = await requireAdmin(req);
+    if (!authorized) return response;
+    
     await dbConnect();
-
     const body = await req.json();
     const { serviceId } = body;
 
