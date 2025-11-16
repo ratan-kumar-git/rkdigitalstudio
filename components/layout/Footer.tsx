@@ -10,17 +10,53 @@ import {
   MessageCircle,
 } from "lucide-react";
 import Logo from "./Logo";
+import { useEffect, useState } from "react";
 
 export default function Footer() {
+  const [visitorCount, setVisitorCount] = useState(0);
+
+  useEffect(() => {
+    // fetch count safely
+    const loadVisitors = async () => {
+      try {
+        const res = await fetch("/api/track-visit");
+        if (!res.ok) return;
+
+        const data = await res.json();
+        setVisitorCount(data.total || 0);
+      } catch {}
+    };
+
+    loadVisitors();
+
+    // track visit only once per 24 hours
+    const visited = localStorage.getItem("visit_today");
+
+    if (!visited) {
+      fetch("/api/track-visit", { method: "POST" });
+      localStorage.setItem("visit_today", "yes");
+
+      setTimeout(() => {
+        localStorage.removeItem("visit_today");
+      }, 24 * 60 * 60 * 1000);
+    }
+  }, []);
+
   return (
     <footer className="bg-[#fff7ed] border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:space-y-0 sm:gap-10">
         {/* 1️⃣ Brand */}
+        {/* Brand */}
         <div className="space-y-4">
           <Logo />
           <p className="text-[#64748b] text-sm leading-relaxed max-w-xs">
             Capturing life’s most beautiful moments through creative photography
             & cinematic storytelling.
+          </p>
+
+          {/* 🎉 Visitor Count */}
+          <p className="text-xs text-[#475569]">
+            Visitors: <span className="font-semibold">{visitorCount}</span>
           </p>
         </div>
 
