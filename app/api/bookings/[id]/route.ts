@@ -55,31 +55,41 @@ export async function PUT(
 
     await dbConnect();
     const { id } = await context.params;
-    const { status } = await req.json();
+
+    const { status }: { status: string } = await req.json();
 
     const allowed = ["pending", "confirmed", "completed", "cancelled"];
-    if (!allowed.includes(status))
+    if (!allowed.includes(status)) {
       return NextResponse.json(
         { success: false, message: "Invalid status" },
         { status: 400 }
       );
+    }
 
-    const updated = await Booking.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
+    const updateFields =
+      status === "pending" || status === "cancelled"
+        ? { status, amountPaid: 0, paymentStatus: "pending" }
+        : { status };
 
-    return NextResponse.json(
-      { success: true, data: updated },
-      { status: 200 }
-    );
+    const updated = await Booking.findByIdAndUpdate(id, updateFields, {
+      new: true,
+    });
+
+    if (!updated) {
+      return NextResponse.json(
+        { success: false, message: "Booking not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data: updated });
   } catch (err) {
-    console.error(err);
+    console.error("Error in booking", err)
     return NextResponse.json(
       { success: false, message: "Server error" },
       { status: 500 }
     );
   }
 }
+
 

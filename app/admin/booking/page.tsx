@@ -83,6 +83,7 @@ export default function AdminBookingPage() {
   // Payment confirmation modal
   const [isPaymentModal, setIsPaymentModal] = useState(false);
   const [paymentBookingId, setPaymentBookingId] = useState<string | null>(null);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /* AUTH CHECK                                                                 */
@@ -163,7 +164,14 @@ export default function AdminBookingPage() {
 
       setBookings((prev) =>
         prev.map((item) =>
-          item._id === actionBookingId ? { ...item, status: actionType } : item
+          item._id === actionBookingId
+            ? {
+                ...item,
+                status: data.data.status,
+                amountPaid: data.data.amountPaid,
+                paymentStatus: data.data.paymentStatus,
+              }
+            : item
         )
       );
 
@@ -187,6 +195,7 @@ export default function AdminBookingPage() {
     }
 
     try {
+      setIsPaymentLoading(true);
       const res = await fetch(`/api/bookings/${id}/payment`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -194,22 +203,33 @@ export default function AdminBookingPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+
+      if (!res.ok) {
+        toast.error(data.message || "Something went wrong!");
+        setPaymentAmount("");
+        return;
+      }
 
       toast.success("Payment added");
 
       setBookings((prev) =>
         prev.map((item) =>
           item._id === id
-            ? { ...item, amountPaid: item.amountPaid + Number(paymentAmount) }
+            ? {
+                ...item,
+                amountPaid: data.data.amountPaid,
+                paymentStatus: data.data.paymentStatus,
+              }
             : item
         )
       );
 
       setPaymentAmount("");
     } catch (err) {
-      console.log("error in update payment", err);
+      console.error("Error in update payment:", err);
       toast.error("Failed to update payment");
+    } finally {
+      setIsPaymentLoading(false);
     }
   };
 
@@ -521,6 +541,7 @@ export default function AdminBookingPage() {
 
             <Button
               className="bg-amber-600 hover:bg-amber-700 text-white"
+              disabled={isPaymentLoading}
               onClick={async () => {
                 if (paymentBookingId) {
                   await handlePayment(paymentBookingId);
@@ -528,6 +549,7 @@ export default function AdminBookingPage() {
                 setIsPaymentModal(false);
               }}
             >
+              {isPaymentLoading && <Spinner className="w-4 h-4 text-white" />}
               Confirm
             </Button>
           </DialogFooter>
