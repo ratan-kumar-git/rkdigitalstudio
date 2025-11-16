@@ -16,10 +16,28 @@ export async function POST() {
 }
 
 export async function GET() {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const total = await Visit.countDocuments();
+    const total = await Visit.countDocuments();
 
-  return NextResponse.json({ total });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const todayVisitors = await Visit.countDocuments({
+      createdAt: { $gte: today },
+    });
+
+    return NextResponse.json({
+      success: true,
+      total,
+      today: todayVisitors,
+    });
+  } catch (err) {
+    console.error("Visitor GET error", err);
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch visitor count" },
+      { status: 500 }
+    );
+  }
 }
-

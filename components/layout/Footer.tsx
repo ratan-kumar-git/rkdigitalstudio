@@ -13,23 +13,19 @@ import Logo from "./Logo";
 import { useEffect, useState } from "react";
 
 export default function Footer() {
-  const [visitorCount, setVisitorCount] = useState(0);
+  const [total, setTotal] = useState(0)
+  const [today, setToday] = useState(0)
 
   useEffect(() => {
-    // fetch count safely
-    const loadVisitors = async () => {
-      try {
-        const res = await fetch("/api/track-visit");
-        if (!res.ok) return;
-
-        const data = await res.json();
-        setVisitorCount(data.total || 0);
-      } catch {}
-    };
+    async function loadVisitors() {
+      const res = await fetch("/api/track-visit");
+      const data = await res.json();
+      setTotal(data.total);
+      setToday(data.today);
+    }
 
     loadVisitors();
 
-    // track visit only once per 24 hours
     const visited = localStorage.getItem("visit_today");
 
     if (!visited) {
@@ -56,7 +52,9 @@ export default function Footer() {
 
           {/* 🎉 Visitor Count */}
           <p className="text-xs text-[#475569]">
-            Visitors: <span className="font-semibold">{visitorCount}</span>
+            Today Visitors: <span className="font-semibold">{today}</span>
+            <br />
+            Total Visitors: <span className="font-semibold">{total}</span>
           </p>
         </div>
 
