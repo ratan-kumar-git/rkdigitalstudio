@@ -13,29 +13,55 @@ import Logo from "./Logo";
 import { useEffect, useState } from "react";
 
 export default function Footer() {
-  const [total, setTotal] = useState(0)
-  const [today, setToday] = useState(0)
+  const [total, setTotal] = useState(0);
+  const [today, setToday] = useState(0);
 
   useEffect(() => {
+    const VISIT_KEY = "visit_today";
+    const DAY_MS = 24 * 60 * 60 * 1000;
+
     async function loadVisitors() {
-      const res = await fetch("/api/track-visit");
-      const data = await res.json();
-      setTotal(data.total);
-      setToday(data.today);
+      try {
+        const res = await fetch("/api/track-visit");
+        if (!res.ok) {
+          console.error("Failed to load visitor counts", res.status);
+          return;
+        }
+        const data = await res.json();
+        setTotal(data.total ?? 0);
+        setToday(data.today ?? 0);
+      } catch (err) {
+        console.error("Error loading visitor counts", err);
+      }
     }
 
-    loadVisitors();
+    async function trackIfNeededAndRefresh() {
+      try {
+        const now = Date.now();
+        const raw = localStorage.getItem(VISIT_KEY);
 
-    const visited = localStorage.getItem("visit_today");
+        let needToTrack = false;
+        if (!raw) {
+          needToTrack = true;
+        } else {
+          const expiry = Number(raw);
+          if (isNaN(expiry) || now > expiry) {
+            needToTrack = true;
+          }
+        }
 
-    if (!visited) {
-      fetch("/api/track-visit", { method: "POST" });
-      localStorage.setItem("visit_today", "yes");
-
-      setTimeout(() => {
-        localStorage.removeItem("visit_today");
-      }, 24 * 60 * 60 * 1000);
+        if (needToTrack) {
+          await fetch("/api/track-visit", { method: "POST" });
+          localStorage.setItem(VISIT_KEY, String(now + DAY_MS));
+        }
+        await loadVisitors();
+      } catch (err) {
+        console.error("Error tracking visit", err);
+        await loadVisitors();
+      }
     }
+
+    trackIfNeededAndRefresh();
   }, []);
 
   return (
